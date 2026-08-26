@@ -1,27 +1,110 @@
-# InventoryStockManagement
+# Inventory Stock Management
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.17.
+Frontend-only inventory and stock management application built with Angular 17, TypeScript, RxJS, and Tailwind CSS.
 
-## Development server
+The application is organized into lazy-loaded feature modules for the dashboard, products, categories, and suppliers. Product workflows include reactive-form validation, stock adjustment, search, filters, pagination, and stock-status alerts.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Current Data Source
 
-## Code scaffolding
+The frontend currently uses local mock data and in-memory RxJS state. There is no backend or database required to run the project. Services are kept as the integration boundary for replacing mock data with an API later.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Prerequisites
 
-## Build
+Install the following before setup:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- Node.js 18.13 or newer
+- npm 9 or newer
+- A modern browser
+- Google Chrome is required for the default Karma unit-test launcher
 
-## Running unit tests
+Check your installed versions:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+node --version
+npm --version
+```
 
-## Running end-to-end tests
+## Installation and Setup
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+1. Clone the repository and open the project directory:
 
-## Further help
+	```bash
+	git clone <repository-url>
+	cd inventory_stock_management
+	```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+2. Install the project dependencies:
+
+	```bash
+	npm install
+	```
+
+3. Confirm Tailwind CSS is available through the installed dependencies. Tailwind is configured in `tailwind.config.js`, and global directives are loaded from `src/styles.css`.
+
+4. Start the development server:
+
+	```bash
+	npm start
+	```
+
+5. Open `http://localhost:4200/` in a browser. The default route redirects to the dashboard.
+
+The development server reloads automatically when source files change.
+
+## Available Commands
+
+| Command | Description |
+| --- | --- |
+| `npm start` | Start the development server at `http://localhost:4200/` |
+| `npm run build` | Create a production build in `dist/` |
+| `npm run watch` | Rebuild continuously using the development configuration |
+| `npm test` | Run Angular unit tests with Karma |
+| `npx ng generate component <name>` | Generate an Angular component |
+| `npx ng generate module <name>` | Generate an Angular NgModule |
+
+For Angular CLI commands, use workspace-relative paths without a leading slash. For example:
+
+```bash
+npx ng generate module core/state
+```
+
+## Application Routes
+
+- `/dashboard` - Inventory summary and stock alerts
+- `/products` - Product list, search, filters, pagination, and actions
+- `/products/new` - Add a product
+- `/products/:id/edit` - Edit a product
+- `/categories` - Category management
+- `/suppliers` - Supplier management
+
+## Project Structure
+
+```text
+src/app/
+├── core/       # Singleton services and inventory state
+├── models/     # Shared TypeScript interfaces and types
+├── shared/     # Reusable UI components
+├── layout/     # Application shell, sidebar, and topbar
+└── features/   # Lazy-loaded dashboard and management features
+```
+
+See [docs/Plan.md](docs/Plan.md) for the complete frontend implementation plan.
+
+## Testing Notes
+
+Unit tests use Angular, Jasmine, Karma, and ChromeHeadless. If Chrome is installed in a non-default location, set the `CHROME_BIN` environment variable before running tests.
+
+```powershell
+$env:CHROME_BIN = "C:\Path\To\chrome.exe"
+npm test -- --watch=false --browsers=ChromeHeadless
+```
+
+## Build Verification
+
+Run the production build before committing changes:
+
+```bash
+npm run build
+```
+
+The build output is generated in `dist/inventory_stock_management/` and should not be edited manually.
