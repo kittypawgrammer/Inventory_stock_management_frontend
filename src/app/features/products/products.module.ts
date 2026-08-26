@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { ProductsRoutingModule } from './products-routing.module';
 import { ProductListComponent } from './product-list/product-list.component';
 import { ProductFormComponent } from './product-form/product-form.component';
 import { StockAdjustModalComponent } from './stock-adjust-modal/stock-adjust-modal.component';
@@ -12,7 +13,8 @@ import { StockAdjustModalComponent } from './stock-adjust-modal/stock-adjust-mod
     StockAdjustModalComponent
   ],
   imports: [
-    CommonModule
+    CommonModule,
+    ProductsRoutingModule
   ]
 })
 export class ProductsModule { }
