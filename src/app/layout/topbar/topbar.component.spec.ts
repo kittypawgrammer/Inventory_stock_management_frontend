@@ -11,7 +11,7 @@ describe('TopbarComponent', () => {
       declarations: [TopbarComponent]
     })
     .compileComponents();
-    
+
     fixture = TestBed.createComponent(TopbarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -19,5 +19,13 @@ describe('TopbarComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should emit a toggleSidebar event when the menu button is clicked', () => {
+    spyOn(component.toggleSidebar, 'emit');
+
+    component.onToggleSidebar();
+
+    expect(component.toggleSidebar.emit).toHaveBeenCalled();
   });
 });

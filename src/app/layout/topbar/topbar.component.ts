@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { remixNotification2Line } from '@ng-icons/remixicon';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-topbar',
@@ -7,5 +6,9 @@ import { remixNotification2Line } from '@ng-icons/remixicon';
   styleUrl: './topbar.component.css'
 })
 export class TopbarComponent {
+  @Output() toggleSidebar = new EventEmitter<void>();
 
+  onToggleSidebar(): void {
+    this.toggleSidebar.emit();
+  }
 }

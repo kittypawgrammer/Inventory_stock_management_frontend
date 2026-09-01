@@ -11,7 +11,7 @@ describe('LayoutComponent', () => {
       declarations: [LayoutComponent]
     })
     .compileComponents();
-    
+
     fixture = TestBed.createComponent(LayoutComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -19,5 +19,15 @@ describe('LayoutComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should toggle the sidebar open state', () => {
+    component.isSidebarOpen = false;
+
+    component.toggleSidebar();
+    expect(component.isSidebarOpen).toBeTrue();
+
+    component.toggleSidebar();
+    expect(component.isSidebarOpen).toBeFalse();
   });
 });
