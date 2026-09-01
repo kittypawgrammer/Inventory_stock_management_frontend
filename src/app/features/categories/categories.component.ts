@@ -33,15 +33,6 @@ this.categoryService.getCategories().subscribe({
 
 }
 
-countByStatus(status: Category['status']): number {
-
-return this.categories.filter(
-  (category) => category.status === status
-).length;
-
-
-}
-
 deleteCategory(id: number): void {
   this.getCategories();
 }

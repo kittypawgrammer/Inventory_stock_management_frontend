@@ -8,8 +8,7 @@ export interface Category {
   id: number;
   name: string;
   description: string;
-  products: number;
-  status: 'Active' | 'Low Use' | 'Inactive';
+  created_at?: string | null;
 }
 
 //tells Angular to create and manage one service instance , can be use throughout the app

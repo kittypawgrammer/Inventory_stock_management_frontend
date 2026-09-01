@@ -45,31 +45,7 @@
         </p>
       </div>
 
-      <div>
-        <label for="category-products" class="mb-2 block text-sm font-medium text-slate-700">Products in Category</label>
-        <input
-          id="category-products"
-          type="number"
-          formControlName="products"
-          readonly
-          class="w-full rounded-xl border border-slate-300 bg-slate-100 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-        />
-      </div>
-
-      <div>
-        <label for="category-status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
-        <select
-          id="category-status"
-          formControlName="status"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-        >
-          <option>Active</option>
-          <option>Low Use</option>
-          <option>Inactive</option>
-        </select>
-      </div>
-
-
+     
       <div class="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
         <button type="button" (click)="cancel()" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
           Cancel

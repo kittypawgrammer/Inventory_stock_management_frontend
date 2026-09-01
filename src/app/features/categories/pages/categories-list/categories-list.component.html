@@ -26,16 +26,6 @@
             />
           </svg>
         </label>
-
-        <select
-          class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-          aria-label="Filter by status"
-        >
-          <option>All Status</option>
-          <option>Active</option>
-          <option>Low Use</option>
-          <option>Inactive</option>
-        </select>
       </div>
     </div>
   </div>
@@ -46,9 +36,8 @@
         <tr>
           <th class="px-4 py-3 font-medium">Category</th>
           <th class="px-4 py-3 font-medium">Description</th>
-          <th class="px-4 py-3 font-medium">Products</th>
-          <th class="px-4 py-3 font-medium">Status</th>
-          <th class="px-4 py-3 font-medium text-right">Actions</th>
+          <th class="px-4 py-3 font-medium">Created At</th>
+          <th class="px-4 py-3 font-medium">Action</th>
         </tr>
       </thead>
 
@@ -60,19 +49,8 @@
 
           <td class="px-4 py-3 text-slate-600">{{ category.description }}</td>
 
-          <td class="px-4 py-3">{{ category.products }}</td>
-
-          <td class="px-4 py-3">
-            <span
-              [ngClass]="{
-                'bg-emerald-100 text-emerald-700': category.status === 'Active',
-                'bg-amber-100 text-amber-700': category.status === 'Low Use',
-                'bg-red-100 text-red-700': category.status === 'Inactive'
-              }"
-              class="inline-flex rounded-full px-2.5 py-1 text-xs font-medium"
-            >
-              {{ category.status }}
-            </span>
+          <td class="px-4 py-3 text-slate-600">
+            {{ category.created_at ? (category.created_at | date: 'mediumDate') : '—' }}
           </td>
 
           <td class="px-4 py-3">
