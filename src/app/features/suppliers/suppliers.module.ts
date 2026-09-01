@@ -1,15 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 
-import { SuppliersComponent } from './suppliers.component';
-
+import { SuppliersRoutingModule } from './suppliers-routing.module';
+import { SupplierListComponent } from './pages/supplier-list/supplier-list.component';
+import { SuplierFormComponent } from './pages/suplier-form/suplier-form.component';
 
 @NgModule({
-  declarations: [SuppliersComponent],
+  declarations: [
+    SupplierListComponent,
+    SuplierFormComponent
+  ],
   imports: [
     CommonModule,
-    RouterModule.forChild([{ path: '', component: SuppliersComponent }])
+    RouterModule,
+    SuppliersRoutingModule,
+    ReactiveFormsModule
   ]
 })
 export class SuppliersModule { }

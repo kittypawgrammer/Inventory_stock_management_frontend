@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Supplier, SupplierService } from './services/supplier.service';
+import { Supplier, SupplierService } from '../../services/supplier.service';
 
 @Component({
-  selector: 'app-suppliers',
-  templateUrl: './suppliers.component.html',
-  styleUrl: './suppliers.component.css'
+  selector: 'app-supplier-list',
+  templateUrl: './supplier-list.component.html',
+  styleUrl: './supplier-list.component.css'
 })
-export class SuppliersComponent implements OnInit {
+export class SupplierListComponent implements OnInit {
   suppliers: Supplier[] = [];
 
   constructor(private supplierService: SupplierService) {}
