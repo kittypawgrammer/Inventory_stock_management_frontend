@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Category, CategoryService } from '../../services/category.service';
 
 @Component({
@@ -7,14 +7,17 @@ import { Category, CategoryService } from '../../services/category.service';
   styleUrl: './categories-list.component.css'
 })
 export class CategoriesListComponent implements OnInit {
-  categories: Category[] = [];
+  @Input() categories: Category[] = [];
+  @Output() deleteCategoryEvent = new EventEmitter<number>();
 
   constructor(private categoryService: CategoryService) {}
 
   ngOnInit(): void {
-    this.categoryService.getCategories().subscribe((categories) => {
-      this.categories = categories;
-    });
+    if (!this.categories.length) {
+      this.categoryService.getCategories().subscribe((categories) => {
+        this.categories = categories;
+      });
+    }
   }
 
   countByStatus(status: Category['status']): number {
@@ -22,6 +25,10 @@ export class CategoriesListComponent implements OnInit {
   }
 
   deleteCategory(id: number): void {
-    this.categoryService.deleteCategory(id).subscribe();
+    this.deleteCategoryEvent.emit(id);
+
+    if (!this.categories.length) {
+      this.categoryService.deleteCategory(id).subscribe();
+    }
   }
 }

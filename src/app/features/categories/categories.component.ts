@@ -1,27 +1,66 @@
 import { Component, OnInit } from '@angular/core';
+
 import { Category, CategoryService } from './services/category.service';
 
 @Component({
-  selector: 'app-categories',
-  templateUrl: './categories.component.html',
-  styleUrl: './categories.component.css'
+selector: 'app-categories',
+templateUrl: './categories.component.html',
+styleUrl: './categories.component.css'
 })
 export class CategoriesComponent implements OnInit {
-  categories: Category[] = [];
 
-  constructor(private categoryService: CategoryService) {}
+categories: Category[] = [];
 
-  ngOnInit(): void {
-    this.categoryService.getCategories().subscribe((categories) => {
-      this.categories = categories;
-    });
+constructor(
+private categoryService: CategoryService
+) {}
+
+ngOnInit(): void {
+this.getCategories();
+}
+
+getCategories(): void {
+
+this.categoryService.getCategories().subscribe({
+  next: (categories) => {
+    this.categories = categories;
+  },
+
+  error: (error) => {
+    console.error('Error loading categories:', error);
+  }
+});
+
+}
+
+countByStatus(status: Category['status']): number {
+
+return this.categories.filter(
+  (category) => category.status === status
+).length;
+
+
+}
+
+deleteCategory(id: number): void {
+
+this.categoryService.deleteCategory(id).subscribe({
+
+  next: () => {
+
+    // Remove deleted category from UI
+    this.categories = this.categories.filter(
+      (category) => category.id !== id
+    );
+
+  },
+
+  error: (error) => {
+    console.error('Error deleting category:', error);
   }
 
-  countByStatus(status: Category['status']): number {
-    return this.categories.filter((category) => category.status === status).length;
-  }
+});
 
-  deleteCategory(id: number): void {
-    this.categoryService.deleteCategory(id).subscribe();
-  }
+}
+
 }

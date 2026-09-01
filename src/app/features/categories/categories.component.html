@@ -4,12 +4,12 @@
       <h1 class="mt-2 text-3xl font-semibold text-slate-900">Categories</h1>
     </div>
 
-    <button
-      type="button"
+    <a
+      routerLink="/categories/add"
       class="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
     >
       + Add Category
-    </button>
+    </a>
   </div>
 
   <div class="mt-6 grid gap-4 md:grid-cols-3">
@@ -17,163 +17,22 @@
       <p class="text-sm text-slate-500">Total Categories</p>
       <p class="mt-3 text-3xl font-semibold text-slate-900">{{ categories.length }}</p>
     </div>
+
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <p class="text-sm text-slate-500">Active</p>
       <p class="mt-3 text-3xl font-semibold text-emerald-600">{{ countByStatus('Active') }}</p>
     </div>
+
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <p class="text-sm text-slate-500">Low Use</p>
       <p class="mt-3 text-3xl font-semibold text-sky-600">{{ countByStatus('Low Use') }}</p>
     </div>
   </div>
 
-  <section class="mt-8 rounded-2xl border border-slate-200 bg-white shadow-sm">
-    <div class="border-b border-slate-200 px-5 py-4">
-      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 class="text-lg font-semibold text-slate-900">Category List</h2>
-        </div>
-
-        <div class="flex flex-col gap-3 md:flex-row md:items-center">
-          <label class="relative block min-w-[220px]">
-            <span class="sr-only">Search categories</span>
-            <input
-              type="search"
-              placeholder="Search categories"
-              class="w-full rounded-xl border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            />
-            <svg
-              class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M9 3.5a5.5 5.5 0 104.39 9.39l2.96 2.96a1 1 0 101.41-1.41l-2.96-2.96A5.5 5.5 0 009 3.5zm0 2a3.5 3.5 0 110 7 3.5 3.5 0 010-7z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </label>
-
-          <select
-            class="rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-            aria-label="Filter categories"
-          >
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Inactive</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-slate-200 text-left">
-        <thead class="bg-slate-50 text-sm text-slate-600">
-          <tr>
-            <th class="px-5 py-3 font-medium">Category</th>
-            <th class="px-5 py-3 font-medium">Description</th>
-            <th class="px-5 py-3 font-medium">Products</th>
-            <th class="px-5 py-3 font-medium">Status</th>
-            <th class="px-5 py-3 font-medium text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-200 bg-white text-sm text-slate-700">
-          <tr *ngFor="let category of categories">
-            <td class="px-5 py-4">
-              <div class="font-medium text-slate-900">{{ category.name }}</div>
-            </td>
-            <td class="px-5 py-4 text-slate-600">{{ category.description }}</td>
-            <td class="px-5 py-4">{{ category.products }}</td>
-            <td class="px-5 py-4">
-              <span
-                [ngClass]="{
-                  'bg-emerald-100 text-emerald-700': category.status === 'Active',
-                  'bg-amber-100 text-amber-700': category.status === 'Low Use',
-                  'bg-red-100 text-red-700': category.status === 'Inactive'
-                }"
-                class="inline-flex rounded-full px-2.5 py-1 text-xs font-medium"
-              >
-                {{ category.status }}
-              </span>
-            </td>
-            <td class="px-5 py-4">
-              <div class="flex justify-end gap-2">
-                <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">Edit</button>
-                <button type="button" (click)="deleteCategory(category.id)" class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Delete</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="border-t border-slate-200 px-5 py-4">
-      <div class="flex items-center justify-between text-sm text-slate-500">
-        <span>Showing {{ categories.length }} categories</span>
-        <div class="flex items-center gap-2">
-          <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Previous</button>
-          <button type="button" class="rounded-lg border border-slate-300 bg-slate-900 px-3 py-1.5 text-white">1</button>
-          <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-50">2</button>
-          <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Next</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-    <div class="mb-5">
-      <h2 class="text-xl font-semibold text-slate-900">Category Details</h2>
-      <p class="mt-1 text-sm text-slate-500">Create or update a category record.</p>
-    </div>
-
-    <form class="grid gap-5 md:grid-cols-2">
-      <div class="md:col-span-2">
-        <label for="category-name" class="mb-2 block text-sm font-medium text-slate-700">Category Name</label>
-        <input
-          id="category-name"
-          type="text"
-          value="Electronics"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-        />
-      </div>
-
-      <div class="md:col-span-2">
-        <label for="category-description" class="mb-2 block text-sm font-medium text-slate-700">Description</label>
-        <textarea
-          id="category-description"
-          rows="4"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-        >Phones, accessories, gadgets and digital devices.</textarea>
-      </div>
-
-      <div>
-        <label for="category-status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
-        <select
-          id="category-status"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-        >
-          <option selected>Active</option>
-          <option>Inactive</option>
-        </select>
-      </div>
-
-      <div>
-        <label for="category-sort" class="mb-2 block text-sm font-medium text-slate-700">Display Order</label>
-        <input
-          id="category-sort"
-          type="number"
-          value="1"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-        />
-      </div>
-
-      <div class="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
-        <button type="button" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">Cancel</button>
-        <button type="submit" class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">Save Category</button>
-      </div>
-    </form>
+  <section class="mt-8">
+    <app-categories-list
+      [categories]="categories"
+      (deleteCategoryEvent)="deleteCategory($event)"
+    ></app-categories-list>
   </section>
 </main>
-
