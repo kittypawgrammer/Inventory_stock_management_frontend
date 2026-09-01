@@ -1,1 +1,157 @@
-<p>products-form works!</p>
+<main class="mx-auto max-w-5xl p-6">
+  <div class="mb-6 flex items-center justify-between gap-4">
+    <div>
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">Products</p>
+      <h1 class="mt-2 text-3xl font-semibold text-slate-900">
+        {{ isEditMode ? 'Edit Product' : 'Add Product' }}
+      </h1>
+    </div>
+
+    <button
+      type="button"
+      (click)="cancel()"
+      class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+    >
+      Back to list
+    </button>
+  </div>
+
+  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="grid gap-5 md:grid-cols-2">
+      <div>
+        <label for="product-name" class="mb-2 block text-sm font-medium text-slate-700">Product Name</label>
+        <input
+          id="product-name"
+          type="text"
+          formControlName="name"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('name')?.touched && productForm.get('name')?.invalid"
+        />
+        <p *ngIf="productForm.get('name')?.touched && productForm.get('name')?.invalid" class="mt-1 text-xs text-red-600">
+          Product name is required.
+        </p>
+      </div>
+
+      <div>
+        <label for="product-sku" class="mb-2 block text-sm font-medium text-slate-700">SKU</label>
+        <input
+          id="product-sku"
+          type="text"
+          formControlName="sku"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('sku')?.touched && productForm.get('sku')?.invalid"
+        />
+        <p *ngIf="productForm.get('sku')?.touched && productForm.get('sku')?.invalid" class="mt-1 text-xs text-red-600">
+          SKU is required.
+        </p>
+      </div>
+
+      <div>
+        <label for="product-category" class="mb-2 block text-sm font-medium text-slate-700">Category</label>
+        <select
+          id="product-category"
+          formControlName="category"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <option>Electronics</option>
+          <option>Office Supplies</option>
+          <option>Home Goods</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="product-supplier" class="mb-2 block text-sm font-medium text-slate-700">Supplier</label>
+        <select
+          id="product-supplier"
+          formControlName="supplier"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <option>Northwind Supply</option>
+          <option>Prime Retail Co.</option>
+          <option>Urban Market</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="product-price" class="mb-2 block text-sm font-medium text-slate-700">Unit Price</label>
+        <input
+          id="product-price"
+          type="number"
+          formControlName="price"
+          step="0.01"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('price')?.touched && productForm.get('price')?.invalid"
+        />
+        <p *ngIf="productForm.get('price')?.touched && productForm.get('price')?.invalid" class="mt-1 text-xs text-red-600">
+          Price must be greater than zero.
+        </p>
+      </div>
+
+      <div>
+        <label for="product-quantity" class="mb-2 block text-sm font-medium text-slate-700">Quantity</label>
+        <input
+          id="product-quantity"
+          type="number"
+          formControlName="quantity"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('quantity')?.touched && productForm.get('quantity')?.invalid"
+        />
+        <p *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.invalid" class="mt-1 text-xs text-red-600">
+          Quantity cannot be negative.
+        </p>
+      </div>
+
+      <div>
+        <label for="product-reorder" class="mb-2 block text-sm font-medium text-slate-700">Reorder Level</label>
+        <input
+          id="product-reorder"
+          type="number"
+          formControlName="reorderLevel"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('reorderLevel')?.touched && productForm.get('reorderLevel')?.invalid"
+        />
+        <p *ngIf="productForm.get('reorderLevel')?.touched && productForm.get('reorderLevel')?.invalid" class="mt-1 text-xs text-red-600">
+          Reorder level cannot be negative.
+        </p>
+      </div>
+
+      <div>
+        <label for="product-status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
+        <select
+          id="product-status"
+          formControlName="status"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+        >
+          <option>In Stock</option>
+          <option>Low Stock</option>
+          <option>Out of Stock</option>
+        </select>
+      </div>
+
+      <div class="md:col-span-2">
+        <label for="product-description" class="mb-2 block text-sm font-medium text-slate-700">Description</label>
+        <textarea
+          id="product-description"
+          rows="4"
+          formControlName="description"
+          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('description')?.touched && productForm.get('description')?.invalid"
+        ></textarea>
+        <p *ngIf="productForm.get('description')?.touched && productForm.get('description')?.invalid" class="mt-1 text-xs text-red-600">
+          Description must be at least 10 characters.
+        </p>
+      </div>
+
+      <div class="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+        <button type="button" (click)="cancel()" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Cancel
+        </button>
+        <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          {{ isEditMode ? 'Update Product' : 'Save Product' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</main>
+
+
