@@ -43,24 +43,7 @@ return this.categories.filter(
 }
 
 deleteCategory(id: number): void {
-
-this.categoryService.deleteCategory(id).subscribe({
-
-  next: () => {
-
-    // Remove deleted category from UI
-    this.categories = this.categories.filter(
-      (category) => category.id !== id
-    );
-
-  },
-
-  error: (error) => {
-    console.error('Error deleting category:', error);
-  }
-
-});
-
+  this.getCategories();
 }
 
 }

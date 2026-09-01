@@ -25,10 +25,26 @@ export class CategoriesListComponent implements OnInit {
   }
 
   deleteCategory(id: number): void {
-    this.deleteCategoryEvent.emit(id);
+    const category = this.categories.find((item) => item.id === id);
 
-    if (!this.categories.length) {
-      this.categoryService.deleteCategory(id).subscribe();
+    if (!category) {
+      return;
     }
+
+    const confirmed = window.confirm(`Are you sure you want to delete "${category.name}"?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    this.categoryService.deleteCategory(id).subscribe({
+      next: () => {
+        this.categories = this.categories.filter((item) => item.id !== id);
+        this.deleteCategoryEvent.emit(id);
+      },
+      error: (error) => {
+        console.error('Error deleting category:', error);
+      }
+    });
   }
 }

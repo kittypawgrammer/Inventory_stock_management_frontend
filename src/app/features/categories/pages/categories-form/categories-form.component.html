@@ -51,12 +51,9 @@
           id="category-products"
           type="number"
           formControlName="products"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-          [class.border-red-500]="categoryForm.get('products')?.touched && categoryForm.get('products')?.invalid"
+          readonly
+          class="w-full rounded-xl border border-slate-300 bg-slate-100 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
         />
-        <p *ngIf="categoryForm.get('products')?.touched && categoryForm.get('products')?.invalid" class="mt-1 text-xs text-red-600">
-          Products count cannot be negative.
-        </p>
       </div>
 
       <div>
@@ -72,19 +69,6 @@
         </select>
       </div>
 
-      <div>
-        <label for="category-order" class="mb-2 block text-sm font-medium text-slate-700">Display Order</label>
-        <input
-          id="category-order"
-          type="number"
-          formControlName="displayOrder"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
-          [class.border-red-500]="categoryForm.get('displayOrder')?.touched && categoryForm.get('displayOrder')?.invalid"
-        />
-        <p *ngIf="categoryForm.get('displayOrder')?.touched && categoryForm.get('displayOrder')?.invalid" class="mt-1 text-xs text-red-600">
-          Display order must be at least 1.
-        </p>
-      </div>
 
       <div class="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
         <button type="button" (click)="cancel()" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">

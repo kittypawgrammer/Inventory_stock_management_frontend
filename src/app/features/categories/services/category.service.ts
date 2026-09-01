@@ -10,7 +10,6 @@ export interface Category {
   description: string;
   products: number;
   status: 'Active' | 'Low Use' | 'Inactive';
-  displayOrder: number;
 }
 
 //tells Angular to create and manage one service instance , can be use throughout the app
