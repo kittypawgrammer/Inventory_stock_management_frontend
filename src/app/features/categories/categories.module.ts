@@ -1,15 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ReactiveFormsModule } from '@angular/forms';
 
-import { CategoriesComponent } from './categories.component';
-
+import { CategoriesRoutingModule } from './categories-routing.module';
+import { CategoriesListComponent } from './pages/categories-list/categories-list.component';
+import { CategoriesFormComponent } from './pages/categories-form/categories-form.component';
 
 @NgModule({
-  declarations: [CategoriesComponent],
+  declarations: [
+    CategoriesListComponent,
+    CategoriesFormComponent
+  ],
   imports: [
     CommonModule,
-    RouterModule.forChild([{ path: '', component: CategoriesComponent }])
+    RouterModule,
+    CategoriesRoutingModule,
+    ReactiveFormsModule
   ]
 })
 export class CategoriesModule { }
