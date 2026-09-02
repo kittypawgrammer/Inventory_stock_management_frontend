@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Supplier, SupplierService } from '../../services/supplier.service';
@@ -9,12 +9,13 @@ export interface Suggestion {
 }
 
 @Component({
-  selector: 'app-supplier-list',
+  selector: 'app-suppliers-list',
   templateUrl: './supplier-list.component.html',
   styleUrl: './supplier-list.component.css'
 })
 export class SupplierListComponent implements OnInit, OnDestroy {
-  suppliers: Supplier[] = [];
+  @Input() suppliers: Supplier[] = [];
+
   searchQuery = '';
   showSuggestions = false;
   selectedSuggestionIndex = -1;
@@ -31,14 +32,16 @@ export class SupplierListComponent implements OnInit, OnDestroy {
       this.searchQuery = params.get('search') ?? '';
     });
 
-    this.supplierService.getSuppliers().subscribe({
-      next: (suppliers) => {
-        this.suppliers = suppliers;
-      },
-      error: (error) => {
-        console.error('Error loading suppliers:', error);
-      }
-    });
+    if (!this.suppliers.length) {
+      this.supplierService.getSuppliers().subscribe({
+        next: (suppliers) => {
+          this.suppliers = suppliers;
+        },
+        error: (error) => {
+          console.error('Error loading suppliers:', error);
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -110,8 +113,13 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   }
 
   deleteSupplier(id: number): void {
-    this.supplierService.deleteSupplier(id).subscribe(() => {
-      this.suppliers = this.suppliers.filter((supplier) => supplier.id !== id);
+    this.supplierService.deleteSupplier(id).subscribe({
+      next: () => {
+        this.suppliers = this.suppliers.filter((supplier) => supplier.id !== id);
+      },
+      error: (error) => {
+        console.error('Error deleting supplier:', error);
+      }
     });
   }
 }

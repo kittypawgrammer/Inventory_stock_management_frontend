@@ -33,17 +33,14 @@ export class SuplierFormComponent implements OnInit {
     this.isEditMode = !!this.supplierId;
 
     if (this.supplierId) {
-      this.supplierService.getSuppliers().subscribe({
-        next: (suppliers) => {
-          const supplier = suppliers.find((s) => s.id === this.supplierId);
-          if (supplier) {
-            this.supplierForm.patchValue({
-              name: supplier.name,
-              contactEmail: supplier.contactEmail,
-              phone: supplier.phone,
-              address: supplier.address
-            });
-          }
+      this.supplierService.getSupplierById(this.supplierId).subscribe({
+        next: (supplier) => {
+          this.supplierForm.patchValue({
+            name: supplier.name,
+            contactEmail: supplier.contactEmail,
+            phone: supplier.phone,
+            address: supplier.address
+          });
         },
         error: (error) => {
           console.error('Error loading supplier:', error);

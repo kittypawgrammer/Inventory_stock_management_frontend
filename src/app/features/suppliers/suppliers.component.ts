@@ -12,16 +12,17 @@ export class SuppliersComponent implements OnInit {
   constructor(private supplierService: SupplierService) {}
 
   ngOnInit(): void {
-    this.supplierService.getSuppliers().subscribe((suppliers) => {
-      this.suppliers = suppliers;
+    this.getSuppliers();
+  }
+
+  getSuppliers(): void {
+    this.supplierService.getSuppliers().subscribe({
+      next: (suppliers) => {
+        this.suppliers = suppliers;
+      },
+      error: (error) => {
+        console.error('Error loading suppliers:', error);
+      }
     });
-  }
-
-  countByStatus(status: Supplier['status']): number {
-    return this.suppliers.filter((supplier) => supplier.status === status).length;
-  }
-
-  deleteSupplier(id: number): void {
-    this.supplierService.deleteSupplier(id).subscribe();
   }
 }

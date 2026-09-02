@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Category, CategoryService } from '../../services/category.service';
@@ -10,7 +10,6 @@ import { Category, CategoryService } from '../../services/category.service';
 })
 export class CategoriesListComponent implements OnInit, OnDestroy {
   @Input() categories: Category[] = [];
-  @Output() deleteCategoryEvent = new EventEmitter<number>();
 
   searchQuery = '';
   showSuggestions = false;
@@ -129,7 +128,6 @@ export class CategoriesListComponent implements OnInit, OnDestroy {
     this.categoryService.deleteCategory(id).subscribe({
       next: () => {
         this.categories = this.categories.filter((item) => item.id !== id);
-        this.deleteCategoryEvent.emit(id);
       },
       error: (error) => {
         console.error('Error deleting category:', error);
