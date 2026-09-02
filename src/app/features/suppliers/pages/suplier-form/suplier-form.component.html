@@ -1,7 +1,6 @@
 <main class="mx-auto max-w-5xl p-6">
   <div class="mb-6 flex items-center justify-between gap-4">
     <div>
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-violet-600">Suppliers</p>
       <h1 class="mt-2 text-3xl font-semibold text-slate-900">
         {{ isEditMode ? 'Edit Supplier' : 'Add Supplier' }}
       </h1>
@@ -33,15 +32,15 @@
       </div>
 
       <div>
-        <label for="supplier-email" class="mb-2 block text-sm font-medium text-slate-700">Email</label>
+        <label for="supplier-email" class="mb-2 block text-sm font-medium text-slate-700">Contact Email</label>
         <input
           id="supplier-email"
           type="email"
-          formControlName="email"
+          formControlName="contactEmail"
           class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-200"
-          [class.border-red-500]="supplierForm.get('email')?.touched && supplierForm.get('email')?.invalid"
+          [class.border-red-500]="supplierForm.get('contactEmail')?.touched && supplierForm.get('contactEmail')?.invalid"
         />
-        <p *ngIf="supplierForm.get('email')?.touched && supplierForm.get('email')?.invalid" class="mt-1 text-xs text-red-600">
+        <p *ngIf="supplierForm.get('contactEmail')?.touched && supplierForm.get('contactEmail')?.invalid" class="mt-1 text-xs text-red-600">
           Enter a valid email address.
         </p>
       </div>
@@ -61,43 +60,16 @@
       </div>
 
       <div>
-        <label for="supplier-contact" class="mb-2 block text-sm font-medium text-slate-700">Primary Contact</label>
-        <input
-          id="supplier-contact"
-          type="text"
-          formControlName="contact"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-200"
-          [class.border-red-500]="supplierForm.get('contact')?.touched && supplierForm.get('contact')?.invalid"
-        />
-        <p *ngIf="supplierForm.get('contact')?.touched && supplierForm.get('contact')?.invalid" class="mt-1 text-xs text-red-600">
-          Contact person is required.
-        </p>
-      </div>
-
-      <div>
-        <label for="supplier-status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
-        <select
-          id="supplier-status"
-          formControlName="status"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-200"
-        >
-          <option>Active</option>
-          <option>Pending</option>
-          <option>Inactive</option>
-        </select>
-      </div>
-
-      <div class="md:col-span-2">
         <label for="supplier-address" class="mb-2 block text-sm font-medium text-slate-700">Address</label>
         <textarea
           id="supplier-address"
-          rows="4"
+          rows="2"
           formControlName="address"
           class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-200"
           [class.border-red-500]="supplierForm.get('address')?.touched && supplierForm.get('address')?.invalid"
         ></textarea>
         <p *ngIf="supplierForm.get('address')?.touched && supplierForm.get('address')?.invalid" class="mt-1 text-xs text-red-600">
-          Address must be at least 10 characters.
+          Address is required.
         </p>
       </div>
 

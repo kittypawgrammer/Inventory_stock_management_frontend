@@ -8,8 +8,13 @@
           <span class="sr-only">Search categories</span>
 
           <input
+            #searchInput
             type="search"
             placeholder="Search categories"
+            value="{{ searchQuery }}"
+            (input)="onSearchInput(searchInput.value)"
+            (keydown)="onSearchKeydown($event)"
+            (blur)="onBlurSuggestions()"
             class="w-full rounded-xl border border-slate-300 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
           />
 
@@ -25,6 +30,21 @@
               clip-rule="evenodd"
             />
           </svg>
+
+          <div
+            *ngIf="showSuggestions && suggestions.length > 0"
+            class="absolute left-0 right-0 z-10 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+          >
+            <button
+              type="button"
+              *ngFor="let suggestion of suggestions; let i = index"
+              (mousedown)="selectSuggestion(suggestion)"
+              [class]="i === selectedSuggestionIndex ? 'block w-full px-4 py-2 text-left text-sm text-slate-900 bg-emerald-50' : 'block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50'"
+            >
+              {{ suggestion.name }}
+              <span *ngIf="suggestion.description" class="ml-2 text-xs text-slate-400">{{ suggestion.description }}</span>
+            </button>
+          </div>
         </label>
       </div>
     </div>
@@ -42,7 +62,7 @@
       </thead>
 
       <tbody class="divide-y divide-slate-200 bg-white text-sm text-slate-700">
-        <tr *ngFor="let category of categories">
+        <tr *ngFor="let category of filteredCategories">
           <td class="px-4 py-3">
             <div class="font-medium text-slate-900">{{ category.name }}</div>
           </td>
@@ -72,13 +92,16 @@
             </div>
           </td>
         </tr>
+        <tr *ngIf="filteredCategories.length === 0">
+          <td colspan="4" class="px-4 py-12 text-center text-sm text-slate-400">No categories found</td>
+        </tr>
       </tbody>
     </table>
   </div>
 
   <div class="border-t border-slate-200 px-4 py-2">
     <div class="flex items-center justify-between text-sm text-slate-500">
-      <span>Showing {{ categories.length }} categories</span>
+      <span>Showing {{ filteredCategories.length }} of {{ categories.length }} categories</span>
 
       <div class="flex items-center gap-2">
         <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-50">

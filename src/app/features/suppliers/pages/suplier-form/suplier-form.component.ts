@@ -21,11 +21,9 @@ export class SuplierFormComponent implements OnInit {
   ) {
     this.supplierForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
+      contactEmail: ['', [Validators.required, Validators.email]],
       phone: ['', [Validators.required]],
-      contact: ['', [Validators.required]],
-      address: ['', [Validators.required, Validators.minLength(10)]],
-      status: ['Active', Validators.required]
+      address: ['', [Validators.required]]
     });
   }
 
@@ -35,16 +33,20 @@ export class SuplierFormComponent implements OnInit {
     this.isEditMode = !!this.supplierId;
 
     if (this.supplierId) {
-      this.supplierService.getSupplierById(this.supplierId).subscribe((supplier) => {
-        if (supplier) {
-          this.supplierForm.patchValue({
-            name: supplier.name,
-            email: supplier.email,
-            phone: supplier.phone,
-            contact: supplier.contact,
-            address: supplier.address,
-            status: supplier.status
-          });
+      this.supplierService.getSuppliers().subscribe({
+        next: (suppliers) => {
+          const supplier = suppliers.find((s) => s.id === this.supplierId);
+          if (supplier) {
+            this.supplierForm.patchValue({
+              name: supplier.name,
+              contactEmail: supplier.contactEmail,
+              phone: supplier.phone,
+              address: supplier.address
+            });
+          }
+        },
+        error: (error) => {
+          console.error('Error loading supplier:', error);
         }
       });
     }
@@ -59,11 +61,9 @@ export class SuplierFormComponent implements OnInit {
     const formValue = this.supplierForm.value;
     const payload = {
       name: formValue.name,
-      email: formValue.email,
+      contactEmail: formValue.contactEmail,
       phone: formValue.phone,
-      contact: formValue.contact,
-      address: formValue.address,
-      status: formValue.status
+      address: formValue.address
     };
 
     if (this.isEditMode && this.supplierId) {

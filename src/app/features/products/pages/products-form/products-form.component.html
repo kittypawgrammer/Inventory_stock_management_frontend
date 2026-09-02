@@ -1,7 +1,6 @@
-<main class="mx-auto max-w-5xl p-6">
-  <div class="mb-6 flex items-center justify-between gap-4">
+<main class="mx-auto flex h-full max-w-5xl flex-col gap-3 p-6">
+  <div class="flex items-center justify-between gap-4">
     <div>
-      <p class="text-sm font-medium uppercase tracking-[0.2em] text-blue-600">Products</p>
       <h1 class="mt-2 text-3xl font-semibold text-slate-900">
         {{ isEditMode ? 'Edit Product' : 'Add Product' }}
       </h1>
@@ -16,7 +15,7 @@
     </button>
   </div>
 
-  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <section class="form-scroll min-h-0 flex-1 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
     <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="grid gap-5 md:grid-cols-2">
       <div>
         <label for="product-name" class="mb-2 block text-sm font-medium text-slate-700">Product Name</label>
@@ -50,26 +49,32 @@
         <label for="product-category" class="mb-2 block text-sm font-medium text-slate-700">Category</label>
         <select
           id="product-category"
-          formControlName="category"
+          formControlName="categoryId"
           class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('categoryId')?.touched && productForm.get('categoryId')?.invalid"
         >
-          <option>Electronics</option>
-          <option>Office Supplies</option>
-          <option>Home Goods</option>
+          <option [ngValue]="null" disabled>Select a category</option>
+          <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
         </select>
+        <p *ngIf="productForm.get('categoryId')?.touched && productForm.get('categoryId')?.invalid" class="mt-1 text-xs text-red-600">
+          Category is required.
+        </p>
       </div>
 
       <div>
         <label for="product-supplier" class="mb-2 block text-sm font-medium text-slate-700">Supplier</label>
         <select
           id="product-supplier"
-          formControlName="supplier"
+          formControlName="supplierId"
           class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          [class.border-red-500]="productForm.get('supplierId')?.touched && productForm.get('supplierId')?.invalid"
         >
-          <option>Northwind Supply</option>
-          <option>Prime Retail Co.</option>
-          <option>Urban Market</option>
+          <option [ngValue]="null" disabled>Select a supplier</option>
+          <option *ngFor="let supplier of suppliers" [ngValue]="supplier.id">{{ supplier.name }}</option>
         </select>
+        <p *ngIf="productForm.get('supplierId')?.touched && productForm.get('supplierId')?.invalid" class="mt-1 text-xs text-red-600">
+          Supplier is required.
+        </p>
       </div>
 
       <div>
@@ -102,7 +107,7 @@
       </div>
 
       <div>
-        <label for="product-reorder" class="mb-2 block text-sm font-medium text-slate-700">Reorder Level</label>
+        <label for="product-reorder" class="mb-2 block text-sm font-medium text-slate-700">Reorder Qty.</label>
         <input
           id="product-reorder"
           type="number"
@@ -115,31 +120,14 @@
         </p>
       </div>
 
-      <div>
-        <label for="product-status" class="mb-2 block text-sm font-medium text-slate-700">Status</label>
-        <select
-          id="product-status"
-          formControlName="status"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-        >
-          <option>In Stock</option>
-          <option>Low Stock</option>
-          <option>Out of Stock</option>
-        </select>
-      </div>
-
       <div class="md:col-span-2">
-        <label for="product-description" class="mb-2 block text-sm font-medium text-slate-700">Description</label>
+        <label for="product-description" class="mb-2 block text-sm font-medium text-slate-700">Description (optional)</label>
         <textarea
           id="product-description"
           rows="4"
           formControlName="description"
           class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('description')?.touched && productForm.get('description')?.invalid"
         ></textarea>
-        <p *ngIf="productForm.get('description')?.touched && productForm.get('description')?.invalid" class="mt-1 text-xs text-red-600">
-          Description must be at least 10 characters.
-        </p>
       </div>
 
       <div class="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">

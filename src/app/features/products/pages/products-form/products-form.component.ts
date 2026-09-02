@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
+import { CategoryService } from '../../../categories/services/category.service';
+import { SupplierService } from '../../../suppliers/services/supplier.service';
 
 @Component({
   selector: 'app-products-form',
@@ -12,23 +14,26 @@ export class ProductsFormComponent implements OnInit {
   productForm: FormGroup;
   isEditMode = false;
   productId: number | null = null;
+  categories: { id: number; name: string }[] = [];
+  suppliers: { id: number; name: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService
+    private productService: ProductService,
+    private categoryService: CategoryService,
+    private supplierService: SupplierService
   ) {
     this.productForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       sku: ['', [Validators.required]],
-      category: ['', Validators.required],
-      supplier: ['', Validators.required],
+      categoryId: [null, Validators.required],
+      supplierId: [null, Validators.required],
       price: [null, [Validators.required, Validators.min(0.01)]],
       quantity: [null, [Validators.required, Validators.min(0)]],
       reorderLevel: [null, [Validators.required, Validators.min(0)]],
-      status: ['In Stock', Validators.required],
-      description: ['', [Validators.required, Validators.minLength(10)]]
+      description: ['']
     });
   }
 
@@ -37,18 +42,25 @@ export class ProductsFormComponent implements OnInit {
     this.productId = productId ? Number(productId) : null;
     this.isEditMode = !!this.productId;
 
+    this.categoryService.getCategories().subscribe((categories) => {
+      this.categories = categories.map((category) => ({ id: category.id, name: category.name }));
+    });
+
+    this.supplierService.getSuppliers().subscribe((suppliers) => {
+      this.suppliers = suppliers.map((supplier) => ({ id: supplier.id, name: supplier.name }));
+    });
+
     if (this.productId) {
       this.productService.getProductById(this.productId).subscribe((product) => {
         if (product) {
           this.productForm.patchValue({
             name: product.name,
             sku: product.sku,
-            category: product.category,
-            supplier: product.supplier,
+            categoryId: product.categoryId,
+            supplierId: product.supplierId,
             price: product.price,
             quantity: product.quantity,
             reorderLevel: product.reorderLevel,
-            status: product.status,
             description: product.description
           });
         }
@@ -66,12 +78,11 @@ export class ProductsFormComponent implements OnInit {
     const payload = {
       name: formValue.name,
       sku: formValue.sku,
-      category: formValue.category,
-      supplier: formValue.supplier,
+      categoryId: Number(formValue.categoryId),
+      supplierId: Number(formValue.supplierId),
       price: Number(formValue.price),
       quantity: Number(formValue.quantity),
       reorderLevel: Number(formValue.reorderLevel),
-      status: formValue.status,
       description: formValue.description
     };
 

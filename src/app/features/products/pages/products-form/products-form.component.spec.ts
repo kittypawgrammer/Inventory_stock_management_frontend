@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { ProductsFormComponent } from './products-form.component';
 
@@ -8,10 +11,21 @@ describe('ProductsFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ProductsFormComponent]
+      imports: [HttpClientTestingModule, ReactiveFormsModule],
+      declarations: [ProductsFormComponent],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } }
+        },
+        {
+          provide: Router,
+          useValue: { navigate: () => Promise.resolve(true) }
+        }
+      ]
     })
     .compileComponents();
-    
+
     fixture = TestBed.createComponent(ProductsFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

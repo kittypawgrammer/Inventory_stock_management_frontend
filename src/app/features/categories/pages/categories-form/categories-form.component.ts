@@ -31,8 +31,9 @@ export class CategoriesFormComponent implements OnInit {
     this.isEditMode = !!this.categoryId;
 
     if (this.categoryId) {
-      this.categoryService.getCategoryById(this.categoryId).subscribe({
-        next: (category) => {
+      this.categoryService.getCategories().subscribe({
+        next: (categories) => {
+          const category = categories.find((c) => c.id === this.categoryId);
           if (category) {
             this.categoryForm.patchValue({
               name: category.name,

@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../../../environments/environment.development';
 
 export interface Product {
   id: number;
   name: string;
   sku: string;
-  category: string;
-  supplier: string;
+  categoryId: number;
+  supplierId: number;
   price: number;
   quantity: number;
   reorderLevel: number;
@@ -14,106 +16,138 @@ export interface Product {
   description: string;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+}
+
+interface ApiProduct {
+  id: number;
+  name: string;
+  sku: string;
+  category_id: number | string | { id: number; name: string };
+  supplier_id: number | string | { id: number; name: string };
+  unit_price: string | number;
+  quantity_in_stock: number;
+  reorder_level: number;
+  stock_status?: string;
+  description?: string;
+}
+
+type ProductResponse = ApiProduct | ApiProduct[] | { items: ApiProduct[] };
+
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private productsSubject = new BehaviorSubject<Product[]>([
-    {
-      id: 1,
-      name: 'Wireless Headphones',
-      sku: 'WH-2048',
-      category: 'Electronics',
-      supplier: 'Northwind Supply',
-      price: 129.99,
-      quantity: 45,
-      reorderLevel: 15,
-      status: 'In Stock',
-      description: 'Noise-cancelling wireless headset designed for long office calls and focus-heavy work sessions.'
-    },
-    {
-      id: 2,
-      name: 'Office Chair',
-      sku: 'OC-118',
-      category: 'Office Supplies',
-      supplier: 'Prime Retail Co.',
-      price: 249,
-      quantity: 12,
-      reorderLevel: 18,
-      status: 'Low Stock',
-      description: 'Ergonomic office chair with adjustable arms and breathable mesh back.'
-    },
-    {
-      id: 3,
-      name: 'Kitchen Organizer',
-      sku: 'KO-320',
-      category: 'Home Goods',
-      supplier: 'Urban Market',
-      price: 39.5,
-      quantity: 0,
-      reorderLevel: 10,
-      status: 'Out of Stock',
-      description: 'Compact kitchen storage system for organizing pantry and countertop essentials.'
-    }
-  ]);
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/products/`;
+
+  constructor(private http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
-    return this.productsSubject.asObservable();
+    return this.http
+      .get<ProductResponse>(this.apiUrl)
+      .pipe(map((response) => this.extractItems(response).map((item) => this.mapToProduct(item))));
   }
 
   getProductById(id: number): Observable<Product | undefined> {
-    return of(this.productsSubject.value.find((product) => product.id === id));
+    return this.http.get<ProductResponse>(`${this.apiUrl}${id}/`).pipe(
+      map((response) => {
+        const item = this.extractItems(response)[0];
+        return item ? this.mapToProduct(item) : undefined;
+      })
+    );
   }
 
   addProduct(product: Omit<Product, 'id' | 'status'> & { status?: Product['status'] }): Observable<Product> {
-    const nextProduct: Product = {
-      ...product,
-      id: this.getNextId(),
-      status: this.calculateStatus(product.quantity, product.reorderLevel)
-    } as Product;
+    const body = {
+      name: product.name,
+      sku: product.sku,
+      category_id: product.categoryId,
+      supplier_id: product.supplierId,
+      unit_price: product.price,
+      quantity_in_stock: product.quantity,
+      reorder_level: product.reorderLevel,
+      description: product.description
+    };
 
-    this.productsSubject.next([...this.productsSubject.value, nextProduct]);
-    return of(nextProduct);
+    return this.http.post<ProductResponse>(this.apiUrl, body).pipe(map((item) => this.mapToProduct(this.extractItems(item)[0])));
   }
 
   updateProduct(id: number, product: Partial<Product>): Observable<Product> {
-    const currentProducts = [...this.productsSubject.value];
-    const index = currentProducts.findIndex((item) => item.id === id);
-
-    if (index === -1) {
-      return of(product as Product);
-    }
-
-    const updatedProduct: Product = {
-      ...currentProducts[index],
-      ...product,
-      status: this.calculateStatus(product.quantity ?? currentProducts[index].quantity, product.reorderLevel ?? currentProducts[index].reorderLevel)
+    const body: Record<string, unknown> = {
+      name: product.name,
+      sku: product.sku,
+      category_id: product.categoryId,
+      supplier_id: product.supplierId,
+      unit_price: product.price,
+      quantity_in_stock: product.quantity,
+      reorder_level: product.reorderLevel,
+      description: product.description
     };
 
-    currentProducts[index] = updatedProduct;
-    this.productsSubject.next(currentProducts);
-    return of(updatedProduct);
+    return this.http.put<ProductResponse>(`${this.apiUrl}${id}/`, body).pipe(map((item) => this.mapToProduct(this.extractItems(item)[0])));
   }
 
-  deleteProduct(id: number): Observable<Product[]> {
-    const filteredProducts = this.productsSubject.value.filter((product) => product.id !== id);
-    this.productsSubject.next(filteredProducts);
-    return of(filteredProducts);
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}${id}/`);
   }
 
-  private getNextId(): number {
-    return this.productsSubject.value.length + 1;
+  private mapToProduct(item: ApiProduct): Product {
+    return {
+      id: item.id,
+      name: item.name,
+      sku: item.sku,
+      categoryId: this.extractId(item.category_id),
+      supplierId: this.extractId(item.supplier_id),
+      price: Number(item.unit_price),
+      quantity: item.quantity_in_stock,
+      reorderLevel: item.reorder_level,
+      status: this.mapStockStatus(item.stock_status ?? this.calculateStatus(item.quantity_in_stock, item.reorder_level)),
+      description: item.description ?? ''
+    };
+  }
+
+  private extractItems(response: ProductResponse): ApiProduct[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+    if (response && Array.isArray((response as { items?: unknown }).items)) {
+      return (response as { items: ApiProduct[] }).items;
+    }
+    return response ? [response as ApiProduct] : [];
+  }
+
+  private extractId(value: number | string | { id: number; name: string }): number {
+    if (typeof value === 'object') {
+      return value.id;
+    }
+    return Number(value);
+  }
+
+  private mapStockStatus(status: string): Product['status'] {
+    const normalized = status.toLowerCase().trim();
+    if (normalized === 'out of stock') {
+      return 'Out of Stock';
+    }
+    if (normalized === 'low stock') {
+      return 'Low Stock';
+    }
+    return 'In Stock';
   }
 
   private calculateStatus(quantity: number, reorderLevel: number): Product['status'] {
     if (quantity === 0) {
       return 'Out of Stock';
     }
-
     if (quantity <= reorderLevel) {
       return 'Low Stock';
     }
-
     return 'In Stock';
   }
 }

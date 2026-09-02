@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
 
 import { TopbarComponent } from './topbar.component';
 
@@ -8,7 +10,14 @@ describe('TopbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [TopbarComponent]
+      imports: [HttpClientTestingModule],
+      declarations: [TopbarComponent],
+      providers: [
+        {
+          provide: Router,
+          useValue: { navigate: jasmine.createSpy('navigate') }
+        }
+      ]
     })
     .compileComponents();
 
