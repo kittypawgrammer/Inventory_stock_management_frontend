@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
+
 import { Product, ProductService } from '../../services/product.service';
 import { CategoryService } from '../../../categories/services/category.service';
 import { SupplierService } from '../../../suppliers/services/supplier.service';
@@ -10,16 +10,20 @@ import { SupplierService } from '../../../suppliers/services/supplier.service';
   templateUrl: './products-list.component.html',
   styleUrl: './products-list.component.css'
 })
-export class ProductsListComponent implements OnInit, OnDestroy {
-  products: Product[] = [];
+export class ProductsListComponent implements OnInit {
+
+  // Products received from parent component
+  @Input() products: Product[] = [];
+
+  // Search and filter values
   selectedStatus = 'All Status';
   searchQuery = '';
   showSuggestions = false;
   selectedSuggestionIndex = -1;
 
+  // Store category and supplier names using their IDs
   private categoryNames = new Map<number, string>();
   private supplierNames = new Map<number, string>();
-  private routeSubscription?: Subscription;
 
   constructor(
     private productService: ProductService,
@@ -29,38 +33,34 @@ export class ProductsListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadData();
-    this.routeSubscription = this.route.queryParamMap.subscribe((params) => {
-      this.searchQuery = params.get('search') ?? '';
-    });
-  }
 
-  ngOnDestroy(): void {
-    this.routeSubscription?.unsubscribe();
-  }
-
-  loadData(): void {
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.products = products;
-      },
-      error: (error) => {
-        console.error('Error loading products:', error);
-      }
+    // Get search value from URL
+    this.route.queryParamMap.subscribe((params) => {
+      this.searchQuery = params.get('search') || '';
     });
 
+    // Get categories
     this.categoryService.getCategories().subscribe({
       next: (categories) => {
-        this.categoryNames = new Map(categories.map((c) => [c.id, c.name]));
+
+        categories.forEach((category) => {
+          this.categoryNames.set(category.id, category.name);
+        });
+
       },
       error: (error) => {
         console.error('Error loading categories:', error);
       }
     });
 
+    // Get suppliers
     this.supplierService.getSuppliers().subscribe({
       next: (suppliers) => {
-        this.supplierNames = new Map(suppliers.map((s) => [s.id, s.name]));
+
+        suppliers.forEach((supplier) => {
+          this.supplierNames.set(supplier.id, supplier.name);
+        });
+
       },
       error: (error) => {
         console.error('Error loading suppliers:', error);
@@ -68,107 +68,186 @@ export class ProductsListComponent implements OnInit, OnDestroy {
     });
   }
 
+
+  // Filter products based on status and search
   get filteredProducts(): Product[] {
+
     let result = this.products;
+
+    // Filter by status
     if (this.selectedStatus !== 'All Status') {
-      result = result.filter((product) => product.status === this.selectedStatus);
+
+      result = result.filter((product) => {
+        return product.status === this.selectedStatus;
+      });
+
     }
+
+    // Convert search text to lowercase
     const query = this.searchQuery.trim().toLowerCase();
+
+    // Filter by search
     if (query) {
-      result = result.filter(
-        (product) =>
+
+      result = result.filter((product) => {
+
+        return (
           product.name.toLowerCase().includes(query) ||
           product.sku.toLowerCase().includes(query) ||
           this.getCategoryName(product).toLowerCase().includes(query) ||
           this.getSupplierName(product).toLowerCase().includes(query)
-      );
+        );
+
+      });
+
     }
+
     return result;
   }
 
+
+  // Get search suggestions
   get suggestions(): Product[] {
+
     const query = this.searchQuery.trim().toLowerCase();
+
+    // If search is empty, show no suggestions
     if (!query) {
       return [];
     }
-    const matches = this.products.filter(
-      (product) =>
+
+    const matches = this.products.filter((product) => {
+
+      return (
         product.name.toLowerCase().includes(query) ||
         product.sku.toLowerCase().includes(query) ||
         this.getCategoryName(product).toLowerCase().includes(query) ||
         this.getSupplierName(product).toLowerCase().includes(query)
-    );
-    return this.dedupe(matches).slice(0, 8);
+      );
+
+    });
+
+    return matches;
   }
 
+  // Get category name using category ID
   getCategoryName(product: Product): string {
-    return this.categoryNames.get(product.categoryId) ?? `#${product.categoryId}`;
+
+    const categoryName = this.categoryNames.get(product.categoryId);
+
+    if (categoryName) {
+      return categoryName;
+    }
+
+    return `#${product.categoryId}`;
   }
 
+
+  // Get supplier name using supplier ID
   getSupplierName(product: Product): string {
-    return this.supplierNames.get(product.supplierId) ?? `#${product.supplierId}`;
+
+    const supplierName = this.supplierNames.get(product.supplierId);
+
+    if (supplierName) {
+      return supplierName;
+    }
+
+    return `#${product.supplierId}`;
   }
 
+
+  // When user types in search box
   onSearchInput(query: string): void {
+
     this.searchQuery = query;
+
     this.showSuggestions = true;
+
     this.selectedSuggestionIndex = -1;
   }
 
+
+  // When user selects a suggestion
   selectSuggestion(product: Product): void {
+
     this.searchQuery = product.name;
+
     this.showSuggestions = false;
   }
 
+
+  // Handle keyboard events
   onSearchKeydown(event: KeyboardEvent): void {
+
     const list = this.suggestions;
+
+    // Stop if there are no suggestions
     if (list.length === 0) {
       return;
     }
+
+    // Arrow Down
     if (event.key === 'ArrowDown') {
+
       event.preventDefault();
-      this.selectedSuggestionIndex = (this.selectedSuggestionIndex + 1) % list.length;
-    } else if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.selectedSuggestionIndex = this.selectedSuggestionIndex <= 0 ? list.length - 1 : this.selectedSuggestionIndex - 1;
-    } else if (event.key === 'Enter' && this.selectedSuggestionIndex >= 0) {
-      event.preventDefault();
-      this.selectSuggestion(list[this.selectedSuggestionIndex]);
-    } else if (event.key === 'Escape') {
-      this.showSuggestions = false;
+
+      this.selectedSuggestionIndex =
+        (this.selectedSuggestionIndex + 1) % list.length;
     }
-  }
 
-  onBlurSuggestions(): void {
-    setTimeout(() => {
-      this.showSuggestions = false;
-      this.selectedSuggestionIndex = -1;
-    }, 150);
-  }
+    // Arrow Up
+    else if (event.key === 'ArrowUp') {
 
-  private dedupe(items: Product[]): Product[] {
-    const seen = new Set<string>();
-    return items.filter((product) => {
-      const key = product.name.toLowerCase();
-      if (seen.has(key)) {
-        return false;
+      event.preventDefault();
+
+      if (this.selectedSuggestionIndex <= 0) {
+        this.selectedSuggestionIndex = list.length - 1;
+      } else {
+        this.selectedSuggestionIndex--;
       }
-      seen.add(key);
-      return true;
-    });
+    }
+
+    // Enter
+    else if (
+      event.key === 'Enter' &&
+      this.selectedSuggestionIndex >= 0
+    ) {
+
+      event.preventDefault();
+
+      this.selectSuggestion(
+        list[this.selectedSuggestionIndex]
+      );
+    }
+
   }
 
-  countByStatus(status: Product['status']): number {
-    return this.products.filter((product) => product.status === status).length;
-  }
 
+  // Change status filter
   onStatusChange(status: string): void {
+
     this.selectedStatus = status;
   }
 
+
+  // Delete product
   deleteProduct(id: number): void {
-    this.productService.deleteProduct(id).subscribe(() => {
-      this.products = this.products.filter((product) => product.id !== id);
+
+    this.productService.deleteProduct(id).subscribe({
+
+      next: () => {
+
+        // Remove deleted product from UI
+        this.products = this.products.filter((product) => {
+          return product.id !== id;
+        });
+
+      },
+
+      error: (error) => {
+        console.error('Error deleting product:', error);
+      }
+
     });
   }
 }

@@ -16,6 +16,8 @@ export class ProductsFormComponent implements OnInit {
   productId: number | null = null;
   categories: { id: number; name: string }[] = [];
   suppliers: { id: number; name: string }[] = [];
+  submitting = false;
+  errorMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -86,16 +88,32 @@ export class ProductsFormComponent implements OnInit {
       description: formValue.description
     };
 
+    this.errorMessage = null;
+    this.submitting = true;
+
     if (this.isEditMode && this.productId) {
-      this.productService.updateProduct(this.productId, payload).subscribe(() => {
-        this.router.navigate(['/products']);
+      this.productService.updateProduct(this.productId, payload).subscribe({
+        next: () => this.router.navigate(['/products']),
+        error: (err) => this.handleSubmitError(err)
       });
       return;
     }
 
-    this.productService.addProduct(payload).subscribe(() => {
-      this.router.navigate(['/products']);
+    this.productService.addProduct(payload).subscribe({
+      next: () => this.router.navigate(['/products']),
+      error: (err) => this.handleSubmitError(err)
     });
+  }
+
+  private handleSubmitError(err: unknown): void {
+    this.submitting = false;
+    const status = (err as { status?: number })?.status;
+
+    if (status === 409) {
+      this.errorMessage = 'A product with this SKU already exists. Please use a different SKU.';
+      return;
+    }
+    this.errorMessage = 'Could not save the product. Please try again.';
   }
 
   cancel(): void {
