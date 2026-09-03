@@ -6,7 +6,7 @@ The application is organized into lazy-loaded feature modules for the dashboard,
 
 ## Current Data Source
 
-The frontend currently uses local mock data and in-memory RxJS state. There is no backend or database required to run the project. Services are kept as the integration boundary for replacing mock data with an API later.
+The frontend talks to a real HTTP API (Django-style backend) at `http://127.0.0.1:8000`. The API host is configurable in `src/environments/environment.development.ts` and the backend must be running for data to load. All requests are made through the services in `core/services/`, which act as the single integration boundary with the backend. If the API is unreachable, the dashboard shows a clear "unable to reach the inventory API" message instead of failing silently.
 
 ## Prerequisites
 
@@ -81,14 +81,26 @@ npx ng generate module core/state
 
 ```text
 src/app/
-├── core/       # Singleton services and inventory state
-├── models/     # Shared TypeScript interfaces and types
-├── shared/     # Reusable UI components
-├── layout/     # Application shell, sidebar, and topbar
-└── features/   # Lazy-loaded dashboard and management features
+├── core/       # Singleton services: API base URL, auth, product/category/supplier/dashboard
+├── auth/       # Login/signup pages and the route guard
+├── layout/     # Application shell: layout wrapper, sidebar, and topbar global search
+└── features/   # Lazy-loaded feature modules: dashboard, products, categories, suppliers
 ```
 
 See [docs/Plan.md](docs/Plan.md) for the complete frontend implementation plan.
+
+## API Requirements
+
+The app expects the following REST endpoints (relative to the base URL in `environment.development.ts`):
+
+| Endpoint | Methods | Purpose |
+| --- | --- | --- |
+| `/api/v1/products/` | GET, POST, DELETE | List and manage products |
+| `/api/v1/products/summary/` | GET | Dashboard summary counts and stock value |
+| `/api/v1/categories/` | GET, POST, PUT, DELETE | List and manage categories |
+| `/api/v1/suppliers/` | GET, POST, PUT, DELETE | List and manage suppliers |
+
+Data contracts: the products list response is wrapped in an `{ "items": [...] }` object, and `unit_price` is sent as a string (coerced to a number in `product.service.ts`). The dashboard `total_stock_value` is returned as pre-formatted currency.
 
 ## Testing Notes
 

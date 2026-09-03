@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
 
+// Product shape as returned by the API.
+// unit_price is a number; quantity_in_stock and reorder_level are whole quantities.
+// stock_status is one of three display-ready values - it is derived by the backend.
 export interface Product {
   id: number;
   name: string;
@@ -17,6 +20,9 @@ export interface Product {
   stock_status: 'In Stock' | 'Low Stock' | 'Out of Stock';
 }
 
+// Converts a raw API response item into the typed Product shape.
+// The backend sends unit_price as a string, so we coerce it to a number and
+// normalize the stock_status casing before the UI consumes the data.
 export function normalizeProduct(item: any): Product {
   return {
     ...item,
@@ -25,6 +31,8 @@ export function normalizeProduct(item: any): Product {
   };
 }
 
+// Maps a loosely-cased status string to the canonical PascalCase value.
+// Anything unrecognized falls back to 'In Stock'.
 function normalizeStatus(value: string): Product['stock_status'] {
   const lower = String(value).toLowerCase();
   if (lower === 'low stock') return 'Low Stock';
@@ -36,18 +44,22 @@ function normalizeStatus(value: string): Product['stock_status'] {
 export class ProductService extends ApiService {
   private readonly endpoint = '/api/v1/products/';
 
+  // Fetches all products. The list endpoint wraps the array in an { items: [] } object.
   getProducts(): Observable<Product[]> {
     return this.http.get<{ items: any[] }>(this.buildUrl(this.endpoint)).pipe(
       map((res) => res.items.map(normalizeProduct))
     );
   }
 
+  // Single product by ID. The backend response is normalized like the list items.
   getProductById(id: number): Observable<Product> {
     return this.http.get<any>(this.buildUrl(`${this.endpoint}${id}`)).pipe(
       map(normalizeProduct)
     );
   }
 
+  // Creates a product. id and stock_status are omitted because the backend
+  // assigns/derives them; stock_status is computed from the supplied quantity.
   addProduct(product: Omit<Product, 'id' | 'stock_status'>): Observable<Product> {
     return this.http.post<Product>(this.buildUrl(this.endpoint), product);
   }

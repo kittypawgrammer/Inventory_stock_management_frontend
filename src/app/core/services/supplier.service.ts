@@ -23,10 +23,13 @@ export class SupplierService extends ApiService {
     return this.http.get<Supplier>(this.buildUrl(`${this.endpoint}${id}`));
   }
 
+  // Unlike categories, the whole supplier object is sent as-is;
+  // editing is a full replace via PUT. id and created_at are backend-managed.
   addSupplier(supplier: Omit<Supplier, 'id' | 'created_at'>): Observable<Supplier> {
     return this.http.post<Supplier>(this.buildUrl(this.endpoint), supplier);
   }
 
+  // Full-replacement update: sends the whole partial object to the PUT endpoint.
   updateSupplier(id: number, supplier: Partial<Omit<Supplier, 'id' | 'created_at'>>): Observable<Supplier> {
     return this.http.put<Supplier>(this.buildUrl(`${this.endpoint}${id}`), supplier);
   }
