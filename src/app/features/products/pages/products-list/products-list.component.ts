@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { Product } from '../../services/product.service';
-import { ProductService } from '../../services/product.service';
+import { Product, ProductService } from '../../services/product.service';
 import { CategoryService } from '../../../categories/services/category.service';
 import { SupplierService } from '../../../suppliers/services/supplier.service';
 
@@ -22,7 +21,7 @@ export class ProductsListComponent implements OnInit {
   showSuggestions = false;
   selectedSuggestionIndex = -1;
 
-  // Store category and supplier names using their IDs
+  // Store category and supplier names using their names
   private categoryNames = new Map<number, string>();
   private supplierNames = new Map<number, string>();
 
@@ -69,7 +68,6 @@ export class ProductsListComponent implements OnInit {
     });
   }
 
-
   // Filter products based on status and search
   get filteredProducts(): Product[] {
 
@@ -105,7 +103,6 @@ export class ProductsListComponent implements OnInit {
 
     return result;
   }
-
 
   // Get search suggestions
   get suggestions(): Product[] {
@@ -143,7 +140,6 @@ export class ProductsListComponent implements OnInit {
     return `#${product.category_id}`;
   }
 
-
   // Get supplier name using supplier ID
   getSupplierName(product: Product): string {
 
@@ -156,7 +152,6 @@ export class ProductsListComponent implements OnInit {
     return `#${product.supplier_id}`;
   }
 
-
   // When user types in search box
   onSearchInput(query: string): void {
 
@@ -167,7 +162,6 @@ export class ProductsListComponent implements OnInit {
     this.selectedSuggestionIndex = -1;
   }
 
-
   // When user selects a suggestion
   selectSuggestion(product: Product): void {
 
@@ -175,7 +169,6 @@ export class ProductsListComponent implements OnInit {
 
     this.showSuggestions = false;
   }
-
 
   // Handle keyboard events
   onSearchKeydown(event: KeyboardEvent): void {
@@ -220,16 +213,13 @@ export class ProductsListComponent implements OnInit {
         list[this.selectedSuggestionIndex]
       );
     }
-
   }
-
 
   // Change status filter
   onStatusChange(status: string): void {
 
     this.selectedStatus = status;
   }
-
 
   // Delete product
   deleteProduct(id: number): void {
@@ -248,7 +238,6 @@ export class ProductsListComponent implements OnInit {
       error: (error) => {
         console.error('Error deleting product:', error);
       }
-
     });
   }
 }

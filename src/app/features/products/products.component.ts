@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Product, ProductService } from './services/product.service';
 
@@ -7,7 +7,7 @@ import { Product, ProductService } from './services/product.service';
   templateUrl: './products.component.html',
   styleUrl: './products.component.css'
 })
-export class ProductsComponent implements OnInit, OnDestroy {
+export class ProductsComponent implements OnInit {
   products: Product[] = [];
 
   private productSubscription?: Subscription;
@@ -16,10 +16,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getProducts();
-  }
-
-  ngOnDestroy(): void {
-    this.productSubscription?.unsubscribe();
   }
 
   getProducts(): void {
