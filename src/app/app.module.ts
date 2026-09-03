@@ -5,15 +5,13 @@ import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
-import { LayoutModule } from "./layout/layout.module";
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     BrowserModule,
     HttpClientModule,
-    RouterModule.forRoot(routes),
-    LayoutModule
+    RouterModule.forRoot(routes)
 ],
   bootstrap: [AppComponent]
 })

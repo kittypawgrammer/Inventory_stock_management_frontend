@@ -24,8 +24,7 @@ export interface Product {
 })
 export class ProductService {
 
-  private readonly apiUrl =
-    `${environment.apiUrl}/api/v1/products/`;
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/products/`;
 
   constructor(private http: HttpClient) { }
 
