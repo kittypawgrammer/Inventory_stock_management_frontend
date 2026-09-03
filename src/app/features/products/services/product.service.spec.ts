@@ -22,7 +22,7 @@ describe('ProductService', () => {
     httpTestingController.verify();
   });
 
-  it('loads products from the API and maps backend fields to the UI model', () => {
+  it('loads products from the API', () => {
     const apiResponse = [
       {
         id: 1,
@@ -46,12 +46,12 @@ describe('ProductService', () => {
           id: 1,
           name: 'Laptop',
           sku: 'LAP-001',
-          categoryId: 5,
-          supplierId: 9,
-          price: 1200,
-          quantity: 12,
-          reorderLevel: 4,
-          status: 'Low Stock'
+          category_id: 5,
+          supplier_id: 9,
+          unit_price: '1200.00',
+          quantity_in_stock: 12,
+          reorder_level: 4,
+          status: 'In Stock'
         })
       ]);
     });

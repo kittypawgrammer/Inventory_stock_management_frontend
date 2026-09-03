@@ -33,7 +33,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  countByStatus(status: Product['status']): number {
-    return this.products.filter((product) => product.status === status).length;
+  countByStatus(status: Product['stock_status']): number {
+    return this.products.filter((product) => product.stock_status === status).length;
   }
 }

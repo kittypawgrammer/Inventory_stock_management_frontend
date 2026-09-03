@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { Product, ProductService } from '../../services/product.service';
+import { Product } from '../../services/product.service';
+import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../../categories/services/category.service';
 import { SupplierService } from '../../../suppliers/services/supplier.service';
 
@@ -78,7 +79,7 @@ export class ProductsListComponent implements OnInit {
     if (this.selectedStatus !== 'All Status') {
 
       result = result.filter((product) => {
-        return product.status === this.selectedStatus;
+        return product.stock_status === this.selectedStatus;
       });
 
     }
@@ -133,26 +134,26 @@ export class ProductsListComponent implements OnInit {
   // Get category name using category ID
   getCategoryName(product: Product): string {
 
-    const categoryName = this.categoryNames.get(product.categoryId);
+    const categoryName = this.categoryNames.get(product.category_id);
 
     if (categoryName) {
       return categoryName;
     }
 
-    return `#${product.categoryId}`;
+    return `#${product.category_id}`;
   }
 
 
   // Get supplier name using supplier ID
   getSupplierName(product: Product): string {
 
-    const supplierName = this.supplierNames.get(product.supplierId);
+    const supplierName = this.supplierNames.get(product.supplier_id);
 
     if (supplierName) {
       return supplierName;
     }
 
-    return `#${product.supplierId}`;
+    return `#${product.supplier_id}`;
   }
 
 

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ProductService } from '../../services/product.service';
-import { CategoryService } from '../../../categories/services/category.service';
-import { SupplierService } from '../../../suppliers/services/supplier.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+
+import { Product, ProductService } from '../../services/product.service';
+import {Category,CategoryService} from '../../../categories/services/category.service';
+import {Supplier,SupplierService} from '../../../suppliers/services/supplier.service';
 
 @Component({
   selector: 'app-products-form',
@@ -11,112 +13,98 @@ import { SupplierService } from '../../../suppliers/services/supplier.service';
   styleUrl: './products-form.component.css'
 })
 export class ProductsFormComponent implements OnInit {
-  productForm: FormGroup;
-  isEditMode = false;
-  productId: number | null = null;
-  categories: { id: number; name: string }[] = [];
-  suppliers: { id: number; name: string }[] = [];
+
+  productForm!: FormGroup;
+
+  // Load categories and suppliers for the dropdowns
+  categories: Category[] = [];
+  suppliers: Supplier[] = [];
+
   submitting = false;
-  errorMessage: string | null = null;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
     private categoryService: CategoryService,
     private supplierService: SupplierService
   ) {
+
     this.productForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      sku: ['', [Validators.required]],
-      categoryId: [null, Validators.required],
-      supplierId: [null, Validators.required],
-      price: [null, [Validators.required, Validators.min(0.01)]],
-      quantity: [null, [Validators.required, Validators.min(0)]],
-      reorderLevel: [null, [Validators.required, Validators.min(0)]],
-      description: ['']
+      name: ['', Validators.required],
+      sku: ['', Validators.required],
+      category_id: [null, Validators.required],
+      supplier_id: [null, Validators.required],
+      unit_price: [null, [Validators.required,Validators.min(0)]],
+      quantity_in_stock: [null, [Validators.required,Validators.min(0)]],
+      reorder_level: [null, [Validators.required,Validators.min(0)]]
     });
+
   }
 
   ngOnInit(): void {
-    const productId = this.route.snapshot.paramMap.get('id');
-    this.productId = productId ? Number(productId) : null;
-    this.isEditMode = !!this.productId;
 
-    this.categoryService.getCategories().subscribe((categories) => {
-      this.categories = categories.map((category) => ({ id: category.id, name: category.name }));
+    // Load categories for the dropdowns
+
+    this.categoryService.getCategories().subscribe({
+      next: (data: Category[]) => {
+        this.categories = data;
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error(error);
+      }
     });
 
-    this.supplierService.getSuppliers().subscribe((suppliers) => {
-      this.suppliers = suppliers.map((supplier) => ({ id: supplier.id, name: supplier.name }));
+    // Load suppliers for the dropdowns
+    this.supplierService.getSuppliers().subscribe({
+      next: (data: Supplier[]) => {
+        this.suppliers = data;
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error(error);
+      }
     });
 
-    if (this.productId) {
-      this.productService.getProductById(this.productId).subscribe((product) => {
-        if (product) {
-          this.productForm.patchValue({
-            name: product.name,
-            sku: product.sku,
-            categoryId: product.categoryId,
-            supplierId: product.supplierId,
-            price: product.price,
-            quantity: product.quantity,
-            reorderLevel: product.reorderLevel,
-            description: product.description
-          });
-        }
-      });
-    }
   }
 
   onSubmit(): void {
+
+    // Validate the form before submission
+
     if (this.productForm.invalid) {
       this.productForm.markAllAsTouched();
       return;
     }
 
-    const formValue = this.productForm.value;
-    const payload = {
-      name: formValue.name,
-      sku: formValue.sku,
-      categoryId: Number(formValue.categoryId),
-      supplierId: Number(formValue.supplierId),
-      price: Number(formValue.price),
-      quantity: Number(formValue.quantity),
-      reorderLevel: Number(formValue.reorderLevel),
-      description: formValue.description
-    };
-
-    this.errorMessage = null;
     this.submitting = true;
+    this.errorMessage = '';
 
-    if (this.isEditMode && this.productId) {
-      this.productService.updateProduct(this.productId, payload).subscribe({
-        next: () => this.router.navigate(['/products']),
-        error: (err) => this.handleSubmitError(err)
-      });
-      return;
-    }
+    const product: Omit<Product, 'id' | 'status'> =
+      this.productForm.value;
 
-    this.productService.addProduct(payload).subscribe({
-      next: () => this.router.navigate(['/products']),
-      error: (err) => this.handleSubmitError(err)
+    // Call the service to add the product
+
+    this.productService.addProduct(product).subscribe({
+
+      next: () => {
+        this.router.navigate(['/products']);
+      },
+
+      error: (error: HttpErrorResponse) => {
+        console.error(error);
+
+        this.submitting = false;
+        this.errorMessage = 'Could not add product.';
+      }
+
     });
+
   }
 
-  private handleSubmitError(err: unknown): void {
-    this.submitting = false;
-    const status = (err as { status?: number })?.status;
-
-    if (status === 409) {
-      this.errorMessage = 'A product with this SKU already exists. Please use a different SKU.';
-      return;
-    }
-    this.errorMessage = 'Could not save the product. Please try again.';
-  }
-
+  //cancel and navigate back to the products list
   cancel(): void {
     this.router.navigate(['/products']);
   }
+
 }

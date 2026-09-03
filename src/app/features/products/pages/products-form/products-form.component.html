@@ -1,149 +1,226 @@
-<main class="mx-auto flex max-w-5xl flex-col gap-3 p-6">
-  <div class="flex items-center justify-between gap-4">
-    <div>
-      <h1 class="mt-2 text-3xl font-semibold text-slate-900">
-        {{ isEditMode ? 'Edit Product' : 'Add Product' }}
-      </h1>
-    </div>
+<main class="mx-auto flex max-w-5xl flex-col gap-3 p-6 overflow-y-auto">
+
+  <!-- Header -->
+
+  <div class="flex items-center justify-between">
+    <h1 class="text-3xl font-semibold text-slate-900">
+      Add Product
+    </h1>
+
+<button
+  type="button"
+  (click)="cancel()"
+  class="rounded-xl border border-slate-300 px-4 py-2.5"
+>
+  Back to list
+</button>
+
+  </div>
+
+  <!-- Form -->
+
+  <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+
+<form
+  [formGroup]="productForm"
+  (ngSubmit)="onSubmit()"
+  class="grid gap-5 md:grid-cols-2"
+>
+
+  <!-- Product Name -->
+  <div>
+    <label>Product Name</label>
+
+    <input
+      type="text"
+      formControlName="name"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    />
+
+    <p
+      *ngIf="productForm.get('name')?.touched && productForm.get('name')?.invalid"
+      class="text-xs text-red-600"
+    >
+      Product name is required.
+    </p>
+  </div>
+
+
+  <!-- SKU -->
+  <div>
+    <label>SKU</label>
+
+    <input
+      type="text"
+      formControlName="sku"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    />
+
+    <p
+      *ngIf="productForm.get('sku')?.touched && productForm.get('sku')?.invalid"
+      class="text-xs text-red-600"
+    >
+      SKU is required.
+    </p>
+  </div>
+
+
+  <!-- Category -->
+  <div>
+    <label>Category</label>
+
+    <select
+      formControlName="category_id"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    >
+      <option [ngValue]="null">Select a category</option>
+
+      <option
+        *ngFor="let category of categories"
+        [ngValue]="category.id"
+      >
+        {{ category.name }}
+      </option>
+    </select>
+
+    <p
+      *ngIf="productForm.get('category_id')?.touched && productForm.get('category_id')?.invalid"
+      class="text-xs text-red-600"
+    >
+      Category is required.
+    </p>
+  </div>
+
+
+  <!-- Supplier -->
+  <div>
+    <label>Supplier</label>
+
+    <select
+      formControlName="supplier_id"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    >
+      <option [ngValue]="null">Select a supplier</option>
+
+      <option
+        *ngFor="let supplier of suppliers"
+        [ngValue]="supplier.id"
+      >
+        {{ supplier.name }}
+      </option>
+    </select>
+
+    <p
+      *ngIf="productForm.get('supplier_id')?.touched && productForm.get('supplier_id')?.invalid"
+      class="text-xs text-red-600"
+    >
+      Supplier is required.
+    </p>
+  </div>
+
+
+  <!-- Price -->
+  <div>
+    <label>Unit Price</label>
+
+    <input
+      type="number"
+      formControlName="unit_price"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    />
+
+    <p
+      *ngIf="productForm.get('unit_price')?.touched && productForm.get('unit_price')?.invalid"
+      class="text-xs text-red-600"
+    >
+      Price must be greater than zero.
+    </p>
+  </div>
+
+
+  <!-- Quantity -->
+  <div>
+    <label>Quantity</label>
+
+    <input
+      type="number"
+      formControlName="quantity_in_stock"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    />
+
+    <p
+      *ngIf="productForm.get('quantity_in_stock')?.touched && productForm.get('quantity_in_stock')?.invalid"
+      class="text-xs text-red-600"
+    >
+      Quantity cannot be negative.
+    </p>
+  </div>
+
+
+  <!-- Reorder Level -->
+  <div>
+    <label>Reorder Qty.</label>
+
+    <input
+      type="number"
+      formControlName="reorder_level"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    />
+
+    <p
+      *ngIf="productForm.get('reorder_level')?.touched && productForm.get('reorder_level')?.invalid"
+      class="text-xs text-red-600"
+    >
+      Reorder level cannot be negative.
+    </p>
+  </div>
+
+
+  <!-- Description -->
+  <div class="md:col-span-2">
+    <label>Description (optional)</label>
+
+    <textarea
+      rows="4"
+      formControlName="description"
+      class="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+    ></textarea>
+  </div>
+
+
+  <!-- Error -->
+  <div
+    *ngIf="errorMessage"
+    class="md:col-span-2 text-sm text-red-600"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <!-- Buttons -->
+  <div class="md:col-span-2 flex justify-end gap-3">
 
     <button
       type="button"
       (click)="cancel()"
-      class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+      [disabled]="submitting"
+      class="rounded-xl border border-slate-300 px-4 py-2.5"
     >
-      Back to list
+      Cancel
     </button>
+
+    <button
+      type="submit"
+      [disabled]="submitting"
+      class="rounded-xl bg-blue-600 px-4 py-2.5 text-white"
+    >
+      {{ submitting ? 'Saving...' : 'Save Product' }}
+    </button>
+
   </div>
 
-  <section class="max-h-[70vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-sm pr-1">
-    <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="grid gap-5 md:grid-cols-2">
-      <div>
-        <label for="product-name" class="mb-2 block text-sm font-medium text-slate-700">Product Name</label>
-        <input
-          id="product-name"
-          type="text"
-          formControlName="name"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('name')?.touched && productForm.get('name')?.invalid"
-        />
-        <p *ngIf="productForm.get('name')?.touched && productForm.get('name')?.invalid" class="mt-1 text-xs text-red-600">
-          Product name is required.
-        </p>
-      </div>
-
-      <div>
-        <label for="product-sku" class="mb-2 block text-sm font-medium text-slate-700">SKU</label>
-        <input
-          id="product-sku"
-          type="text"
-          formControlName="sku"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('sku')?.touched && productForm.get('sku')?.invalid"
-        />
-        <p *ngIf="productForm.get('sku')?.touched && productForm.get('sku')?.invalid" class="mt-1 text-xs text-red-600">
-          SKU is required.
-        </p>
-      </div>
-
-      <div>
-        <label for="product-category" class="mb-2 block text-sm font-medium text-slate-700">Category</label>
-        <select
-          id="product-category"
-          formControlName="categoryId"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('categoryId')?.touched && productForm.get('categoryId')?.invalid"
-        >
-          <option [ngValue]="null" disabled>Select a category</option>
-          <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-        </select>
-        <p *ngIf="productForm.get('categoryId')?.touched && productForm.get('categoryId')?.invalid" class="mt-1 text-xs text-red-600">
-          Category is required.
-        </p>
-      </div>
-
-      <div>
-        <label for="product-supplier" class="mb-2 block text-sm font-medium text-slate-700">Supplier</label>
-        <select
-          id="product-supplier"
-          formControlName="supplierId"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('supplierId')?.touched && productForm.get('supplierId')?.invalid"
-        >
-          <option [ngValue]="null" disabled>Select a supplier</option>
-          <option *ngFor="let supplier of suppliers" [ngValue]="supplier.id">{{ supplier.name }}</option>
-        </select>
-        <p *ngIf="productForm.get('supplierId')?.touched && productForm.get('supplierId')?.invalid" class="mt-1 text-xs text-red-600">
-          Supplier is required.
-        </p>
-      </div>
-
-      <div>
-        <label for="product-price" class="mb-2 block text-sm font-medium text-slate-700">Unit Price</label>
-        <input
-          id="product-price"
-          type="number"
-          formControlName="price"
-          step="0.01"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('price')?.touched && productForm.get('price')?.invalid"
-        />
-        <p *ngIf="productForm.get('price')?.touched && productForm.get('price')?.invalid" class="mt-1 text-xs text-red-600">
-          Price must be greater than zero.
-        </p>
-      </div>
-
-      <div>
-        <label for="product-quantity" class="mb-2 block text-sm font-medium text-slate-700">Quantity</label>
-        <input
-          id="product-quantity"
-          type="number"
-          formControlName="quantity"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('quantity')?.touched && productForm.get('quantity')?.invalid"
-        />
-        <p *ngIf="productForm.get('quantity')?.touched && productForm.get('quantity')?.invalid" class="mt-1 text-xs text-red-600">
-          Quantity cannot be negative.
-        </p>
-      </div>
-
-      <div>
-        <label for="product-reorder" class="mb-2 block text-sm font-medium text-slate-700">Reorder Qty.</label>
-        <input
-          id="product-reorder"
-          type="number"
-          formControlName="reorderLevel"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          [class.border-red-500]="productForm.get('reorderLevel')?.touched && productForm.get('reorderLevel')?.invalid"
-        />
-        <p *ngIf="productForm.get('reorderLevel')?.touched && productForm.get('reorderLevel')?.invalid" class="mt-1 text-xs text-red-600">
-          Reorder level cannot be negative.
-        </p>
-      </div>
-
-      <div class="md:col-span-2">
-        <label for="product-description" class="mb-2 block text-sm font-medium text-slate-700">Description (optional)</label>
-        <textarea
-          id="product-description"
-          rows="4"
-          formControlName="description"
-          class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-        ></textarea>
-      </div>
-
-      <div *ngIf="errorMessage" class="md:col-span-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-        {{ errorMessage }}
-      </div>
-
-      <div class="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
-        <button type="button" (click)="cancel()" [disabled]="submitting" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50">
-          Cancel
-        </button>
-        <button type="submit" [disabled]="submitting" class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70">
-          {{ submitting ? 'Saving...' : (isEditMode ? 'Update Product' : 'Save Product') }}
-        </button>
-      </div>
-    </form>
+</form>
+ 
   </section>
+
 </main>
-
-
