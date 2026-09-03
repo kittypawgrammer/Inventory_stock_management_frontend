@@ -1,8 +1,8 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { ProductService } from '../../features/products/services/product.service';
-import { SupplierService } from '../../features/suppliers/services/supplier.service';
-import { CategoryService } from '../../features/categories/services/category.service';
+import { ProductService } from '../../core/services/product.service';
+import { SupplierService } from '../../core/services/supplier.service';
+import { CategoryService } from '../../core/services/category.service';
 
 export interface Suggestion {
   type: 'product' | 'supplier' | 'category';
@@ -45,7 +45,7 @@ export class TopbarComponent implements OnInit {
 
     this.supplierService.getSuppliers().subscribe({
       next: (suppliers) => {
-        this.suppliers = suppliers.map((s) => ({ id: s.id, name: s.name, email: s.contactEmail }));
+        this.suppliers = suppliers.map((s) => ({ id: s.id, name: s.name, email: s.contact_email }));
       },
       error: (error) => {
         console.error('Error loading suppliers:', error);

@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { Product, ProductService } from '../../services/product.service';
-import { CategoryService } from '../../../categories/services/category.service';
-import { SupplierService } from '../../../suppliers/services/supplier.service';
+import { ProductService, Product } from '../../../../core/services/product.service';
+import { CategoryService } from '../../../../core/services/category.service';
+import { SupplierService } from '../../../../core/services/supplier.service';
 
 @Component({
   selector: 'app-products-list',

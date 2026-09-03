@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Product, ProductService } from './services/product.service';
+import { ProductService, Product } from '../../core/services/product.service';
 
 @Component({
   selector: 'app-products',

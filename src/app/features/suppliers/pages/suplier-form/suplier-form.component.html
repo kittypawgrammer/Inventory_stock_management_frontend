@@ -36,11 +36,11 @@
         <input
           id="supplier-email"
           type="email"
-          formControlName="contactEmail"
+          formControlName="contact_email"
           class="w-full rounded-xl border border-slate-300 bg-slate-50 px-3 py-2.5 text-slate-800 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-200"
-          [class.border-red-500]="supplierForm.get('contactEmail')?.touched && supplierForm.get('contactEmail')?.invalid"
+          [class.border-red-500]="supplierForm.get('contact_email')?.touched && supplierForm.get('contact_email')?.invalid"
         />
-        <p *ngIf="supplierForm.get('contactEmail')?.touched && supplierForm.get('contactEmail')?.invalid" class="mt-1 text-xs text-red-600">
+        <p *ngIf="supplierForm.get('contact_email')?.touched && supplierForm.get('contact_email')?.invalid" class="mt-1 text-xs text-red-600">
           Enter a valid email address.
         </p>
       </div>

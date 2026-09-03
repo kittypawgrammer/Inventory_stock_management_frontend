@@ -1,7 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Supplier, SupplierService } from '../../services/supplier.service';
+import {
+  SupplierService,
+  Supplier
+} from '../../../../core/services/supplier.service';
 
 export interface Suggestion {
   name: string;
@@ -14,12 +17,16 @@ export interface Suggestion {
   styleUrl: './supplier-list.component.css'
 })
 export class SupplierListComponent implements OnInit, OnDestroy {
+
+  // Suppliers received from parent component
   @Input() suppliers: Supplier[] = [];
 
+  // Search values
   searchQuery = '';
   showSuggestions = false;
   selectedSuggestionIndex = -1;
 
+  // Store route subscription
   private routeSubscription?: Subscription;
 
   constructor(
@@ -28,11 +35,15 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+
+    // Get search value from URL
     this.routeSubscription = this.route.queryParamMap.subscribe((params) => {
       this.searchQuery = params.get('search') ?? '';
     });
 
+    // Load suppliers if parent has not provided them
     if (!this.suppliers.length) {
+
       this.supplierService.getSuppliers().subscribe({
         next: (suppliers) => {
           this.suppliers = suppliers;
@@ -45,78 +56,171 @@ export class SupplierListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+
+    // Unsubscribe when component is destroyed
     this.routeSubscription?.unsubscribe();
   }
 
+  // Filter suppliers based on search
   get filteredSuppliers(): Supplier[] {
+
     const query = this.searchQuery.trim().toLowerCase();
+
+    // If search is empty, show all suppliers
     if (!query) {
       return this.suppliers;
     }
-    return this.suppliers.filter(
-      (supplier) =>
+
+    // Filter by name, email, phone or address
+    const result = this.suppliers.filter((supplier) => {
+
+      return (
         supplier.name.toLowerCase().includes(query) ||
-        supplier.contactEmail.toLowerCase().includes(query) ||
+        supplier.contact_email.toLowerCase().includes(query) ||
         supplier.phone.toLowerCase().includes(query) ||
         supplier.address.toLowerCase().includes(query)
-    );
+      );
+
+    });
+
+    return result;
   }
 
+  // Get search suggestions
   get suggestions(): Suggestion[] {
+
     const query = this.searchQuery.trim().toLowerCase();
+
+    // If search is empty, show no suggestions
     if (!query) {
       return [];
     }
 
-    return this.suppliers
-      .filter((s) => s.name.toLowerCase().includes(query) || s.contactEmail.toLowerCase().includes(query))
-      .slice(0, 8)
-      .map((s) => ({ name: s.name, sub: s.contactEmail }));
+    // Find matching suppliers
+    const matches = this.suppliers.filter((supplier) => {
+
+      return (
+        supplier.name.toLowerCase().includes(query) ||
+        supplier.contact_email.toLowerCase().includes(query)
+      );
+
+    });
+
+    // Show maximum 8 suggestions
+    const limitedMatches = matches.slice(0, 8);
+
+    // Convert supplier data into suggestion format
+    const result = limitedMatches.map((supplier) => {
+
+      return {
+        name: supplier.name,
+        sub: supplier.contact_email
+      };
+
+    });
+
+    return result;
   }
 
+  // When user types in search box
   onSearchInput(query: string): void {
+
     this.searchQuery = query;
+
     this.showSuggestions = true;
+
     this.selectedSuggestionIndex = -1;
   }
 
+  // When user selects a suggestion
   selectSuggestion(suggestion: Suggestion): void {
+
     this.searchQuery = suggestion.name;
+
     this.showSuggestions = false;
+
     this.selectedSuggestionIndex = -1;
   }
 
+  // Handle keyboard events
   onSearchKeydown(event: KeyboardEvent): void {
+
     const list = this.suggestions;
+
+    // Stop if there are no suggestions
     if (list.length === 0) {
       return;
     }
+
+    // Arrow Down
     if (event.key === 'ArrowDown') {
+
       event.preventDefault();
-      this.selectedSuggestionIndex = (this.selectedSuggestionIndex + 1) % list.length;
-    } else if (event.key === 'ArrowUp') {
+
+      this.selectedSuggestionIndex =
+        (this.selectedSuggestionIndex + 1) % list.length;
+    }
+
+    // Arrow Up
+    else if (event.key === 'ArrowUp') {
+
       event.preventDefault();
-      this.selectedSuggestionIndex = this.selectedSuggestionIndex <= 0 ? list.length - 1 : this.selectedSuggestionIndex - 1;
-    } else if (event.key === 'Enter' && this.selectedSuggestionIndex >= 0) {
+
+      if (this.selectedSuggestionIndex <= 0) {
+        this.selectedSuggestionIndex = list.length - 1;
+      } else {
+        this.selectedSuggestionIndex =
+          this.selectedSuggestionIndex - 1;
+      }
+    }
+
+    // Enter
+    else if (
+      event.key === 'Enter' &&
+      this.selectedSuggestionIndex >= 0
+    ) {
+
       event.preventDefault();
-      this.selectSuggestion(list[this.selectedSuggestionIndex]);
-    } else if (event.key === 'Escape') {
+
+      this.selectSuggestion(
+        list[this.selectedSuggestionIndex]
+      );
+    }
+
+    // Escape
+    else if (event.key === 'Escape') {
+
       this.showSuggestions = false;
     }
   }
 
+  // Hide suggestions when search box loses focus
   onBlurSuggestions(): void {
+
     setTimeout(() => {
+
       this.showSuggestions = false;
       this.selectedSuggestionIndex = -1;
+
     }, 150);
   }
 
+  // Delete supplier
   deleteSupplier(id: number): void {
+
     this.supplierService.deleteSupplier(id).subscribe({
+
       next: () => {
-        this.suppliers = this.suppliers.filter((supplier) => supplier.id !== id);
+
+        // Remove deleted supplier from UI
+        this.suppliers = this.suppliers.filter((supplier) => {
+
+          return supplier.id !== id;
+
+        });
+
       },
+
       error: (error) => {
         console.error('Error deleting supplier:', error);
       }

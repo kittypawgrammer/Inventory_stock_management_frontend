@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { DashboardService, DashboardSummary } from './services/dashboard.service';
+import { DashboardService, DashboardSummary } from '../../core/services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',

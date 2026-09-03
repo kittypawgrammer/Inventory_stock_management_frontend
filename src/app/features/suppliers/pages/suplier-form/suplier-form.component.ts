@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SupplierService } from '../../services/supplier.service';
+import { SupplierService } from '../../../../core/services/supplier.service';
 
 @Component({
   selector: 'app-suplier-form',
@@ -9,7 +9,9 @@ import { SupplierService } from '../../services/supplier.service';
   styleUrl: './suplier-form.component.css'
 })
 export class SuplierFormComponent implements OnInit {
+
   supplierForm: FormGroup;
+
   isEditMode = false;
   supplierId: number | null = null;
 
@@ -19,28 +21,38 @@ export class SuplierFormComponent implements OnInit {
     private router: Router,
     private supplierService: SupplierService
   ) {
+    // Create supplier form
     this.supplierForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
-      contactEmail: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required]],
-      address: ['', [Validators.required]]
+      contact_email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      address: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.supplierId = id ? Number(id) : null;
-    this.isEditMode = !!this.supplierId;
 
-    if (this.supplierId) {
+    // Get supplier ID from URL
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      this.supplierId = Number(id);
+      this.isEditMode = true;
+    }
+
+    // Load supplier when editing
+    if (this.isEditMode && this.supplierId) {
+
       this.supplierService.getSupplierById(this.supplierId).subscribe({
         next: (supplier) => {
+
           this.supplierForm.patchValue({
             name: supplier.name,
-            contactEmail: supplier.contactEmail,
+            contact_email: supplier.contact_email,
             phone: supplier.phone,
             address: supplier.address
           });
+
         },
         error: (error) => {
           console.error('Error loading supplier:', error);
@@ -50,32 +62,55 @@ export class SuplierFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+
+    // Check form validation
     if (this.supplierForm.invalid) {
       this.supplierForm.markAllAsTouched();
       return;
     }
 
+    // Get form data
     const formValue = this.supplierForm.value;
+
+    // Data sent to API
     const payload = {
       name: formValue.name,
-      contactEmail: formValue.contactEmail,
+      contact_email: formValue.contact_email,
       phone: formValue.phone,
       address: formValue.address
     };
 
+    // Update supplier
     if (this.isEditMode && this.supplierId) {
-      this.supplierService.updateSupplier(this.supplierId, payload).subscribe(() => {
-        this.router.navigate(['/suppliers']);
-      });
+
+      this.supplierService
+        .updateSupplier(this.supplierId, payload)
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/suppliers']);
+          },
+          error: (error) => {
+            console.error('Error updating supplier:', error);
+          }
+        });
+
       return;
     }
 
-    this.supplierService.addSupplier(payload).subscribe(() => {
-      this.router.navigate(['/suppliers']);
+    // Add supplier
+    this.supplierService.addSupplier(payload).subscribe({
+      next: () => {
+        this.router.navigate(['/suppliers']);
+      },
+      error: (error) => {
+        console.error('Error adding supplier:', error);
+      }
     });
   }
 
+  // Go back to supplier list
   cancel(): void {
     this.router.navigate(['/suppliers']);
   }
 }
+

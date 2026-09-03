@@ -3,9 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-import { Product, ProductService } from '../../services/product.service';
-import {Category,CategoryService} from '../../../categories/services/category.service';
-import {Supplier,SupplierService} from '../../../suppliers/services/supplier.service';
+import { ProductService, Product } from '../../../../core/services/product.service';
+import { CategoryService, Category } from '../../../../core/services/category.service';
+import { SupplierService, Supplier } from '../../../../core/services/supplier.service';
 
 @Component({
   selector: 'app-products-form',

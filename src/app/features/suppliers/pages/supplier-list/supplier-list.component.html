@@ -56,10 +56,10 @@
           <td class="px-4 py-3">
             <div class="font-medium text-slate-900">{{ supplier.name }}</div>
           </td>
-          <td class="px-4 py-3 text-slate-600">{{ supplier.contactEmail }}</td>
+          <td class="px-4 py-3 text-slate-600">{{ supplier.contact_email }}</td>
           <td class="px-4 py-3">{{ supplier.phone }}</td>
           <td class="px-4 py-3 text-slate-600">{{ supplier.address }}</td>
-          <td class="px-4 py-3 text-slate-500">{{ supplier.createdAt | date:'mediumDate' }}</td>
+          <td class="px-4 py-3 text-slate-500">{{ supplier.created_at | date:'mediumDate' }}</td>
           <td class="px-4 py-3">
             <div class="flex justify-end gap-2">
               <a [routerLink]="['/suppliers/edit', supplier.id]" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">Edit</a>

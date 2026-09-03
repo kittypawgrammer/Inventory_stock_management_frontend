@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Category, CategoryService } from '../../services/category.service';
+import {
+  CategoryService,
+  Category
+} from '../../../../core/services/category.service';
 
 @Component({
   selector: 'app-categories-form',
@@ -9,7 +12,9 @@ import { Category, CategoryService } from '../../services/category.service';
   styleUrl: './categories-form.component.css'
 })
 export class CategoriesFormComponent implements OnInit {
+
   categoryForm: FormGroup;
+
   isEditMode = false;
   categoryId: number | null = null;
 
@@ -19,72 +24,135 @@ export class CategoriesFormComponent implements OnInit {
     private router: Router,
     private categoryService: CategoryService
   ) {
+
+    // Create category form
     this.categoryForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
+      description: ['', [Validators.required, Validators.minLength(10)]]
     });
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.categoryId = id ? Number(id) : null;
-    this.isEditMode = !!this.categoryId;
 
-    if (this.categoryId) {
-      this.categoryService.getCategoryById(this.categoryId).subscribe({
-        next: (category) => {
-          this.categoryForm.patchValue({
-            name: category.name,
-            description: category.description,
-          });
-        },
-        error: (error) => {
-          console.error('Error loading category:', error);
-        }
-      });
+    // Get category ID from URL
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      this.categoryId = Number(id);
+      this.isEditMode = true;
+    }
+
+    // Load category when editing
+    if (this.isEditMode && this.categoryId) {
+
+      this.categoryService
+        .getCategoryById(this.categoryId)
+        .subscribe({
+
+          next: (category) => {
+
+            // Put existing category data into the form
+            this.categoryForm.patchValue({
+              name: category.name,
+              description: category.description
+            });
+
+          },
+
+          error: (error) => {
+            console.error('Error loading category:', error);
+          }
+
+        });
     }
   }
 
+  // Create data to send to API
   private buildPayload(): Omit<Category, 'id'> {
+
     const formValue = this.categoryForm.value;
 
-    return {
+    const payload = {
       name: formValue.name,
-      description: formValue.description,
+      description: formValue.description
     };
+
+    return payload;
   }
 
   onSubmit(): void {
+
+    // Check form validation
     if (this.categoryForm.invalid) {
+
       this.categoryForm.markAllAsTouched();
+
       return;
     }
 
+    // Get data to send to API
     const payload = this.buildPayload();
 
-    const request$ = this.isEditMode && this.categoryId
-      ? this.categoryService.updateCategory(this.categoryId, payload)
-      : this.categoryService.addCategory(payload);
+    // Update category
+    if (this.isEditMode && this.categoryId) {
 
-    request$.subscribe({
-      next: () => {
-        this.categoryForm.reset({
-          name: '',
-          description: '',
+      this.categoryService
+        .updateCategory(this.categoryId, payload)
+        .subscribe({
+
+          next: () => {
+
+            // Reset form
+            this.categoryForm.reset({
+              name: '',
+              description: ''
+            });
+
+            // Go to category list
+            this.router.navigate(['/categories']);
+          },
+
+          error: (error) => {
+            console.error('Error updating category:', error);
+          }
+
         });
-        this.router.navigate(['/categories']);
-      },
-      error: (error) => {
-        console.error('Error saving category:', error);
-      }
-    });
+
+      return;
+    }
+
+    // Add category
+    this.categoryService
+      .addCategory(payload)
+      .subscribe({
+
+        next: () => {
+
+          // Reset form
+          this.categoryForm.reset({
+            name: '',
+            description: ''
+          });
+
+          // Go to category list
+          this.router.navigate(['/categories']);
+        },
+
+        error: (error) => {
+          console.error('Error adding category:', error);
+        }
+
+      });
   }
 
+  // Go back to category list
   cancel(): void {
+
     this.categoryForm.reset({
       name: '',
-      description: '',
+      description: ''
     });
+
     this.router.navigate(['/categories']);
   }
 }
