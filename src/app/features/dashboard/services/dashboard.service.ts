@@ -18,7 +18,7 @@ providedIn: 'root'
 export class DashboardService {
 
 private readonly apiUrl =
-`${environment.apiUrl}/api/v1/products/summary`;
+`${environment.apiUrl}/api/v1/products/summary/`;
 
 constructor(private http: HttpClient) {}
 

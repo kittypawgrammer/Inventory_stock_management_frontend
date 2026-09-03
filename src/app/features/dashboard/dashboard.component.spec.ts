@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
-import { DashboardService } from '../../core/services/dashboard.service';
-import { DashboardSummary } from '../../models/dashboard.model';
+import { DashboardService, DashboardSummary } from './services/dashboard.service';
 import { DashboardComponent } from './dashboard.component';
 
 describe('DashboardComponent', () => {

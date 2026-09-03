@@ -36,7 +36,7 @@ function mapSupplier(api: SupplierApi): Supplier {
   providedIn: 'root'
 })
 export class SupplierService {
-  private readonly apiUrl = `${environment.apiUrl}/api/v1/suppliers`;
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/suppliers/`;
 
   constructor(private readonly http: HttpClient) {}
 
@@ -45,7 +45,7 @@ export class SupplierService {
   }
 
   getSupplierById(id: number): Observable<Supplier> {
-    return this.http.get<SupplierApi>(`${this.apiUrl}/${id}`).pipe(map(mapSupplier));
+    return this.http.get<SupplierApi>(`${this.apiUrl}${id}`).pipe(map(mapSupplier));
   }
 
   addSupplier(supplier: Omit<Supplier, 'id' | 'createdAt'>): Observable<Supplier> {
@@ -66,10 +66,10 @@ export class SupplierService {
     if (supplier.phone !== undefined) payload['phone'] = supplier.phone;
     if (supplier.address !== undefined) payload['address'] = supplier.address;
 
-    return this.http.put<SupplierApi>(`${this.apiUrl}/${id}`, payload).pipe(map(mapSupplier));
+    return this.http.put<SupplierApi>(`${this.apiUrl}${id}`, payload).pipe(map(mapSupplier));
   }
 
   deleteSupplier(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}${id}`);
   }
 }

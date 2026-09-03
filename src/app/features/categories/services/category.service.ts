@@ -33,7 +33,7 @@ function mapCategory(api: CategoryApi): Category {
 })
 
 export class CategoryService {
-  private readonly apiUrl = `${environment.apiUrl}/api/v1/categories`;
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/categories/`;
 
   constructor(private readonly http: HttpClient) {}
 
@@ -42,7 +42,7 @@ export class CategoryService {
   }
 
   getCategoryById(id: number): Observable<Category> {
-    return this.http.get<CategoryApi>(`${this.apiUrl}/${id}`).pipe(map(mapCategory));
+    return this.http.get<CategoryApi>(`${this.apiUrl}${id}`).pipe(map(mapCategory));
   }
 
   addCategory(category: Omit<Category, 'id' | 'createdAt'>): Observable<Category> {
@@ -59,10 +59,10 @@ export class CategoryService {
     if (category.name !== undefined) payload['name'] = category.name;
     if (category.description !== undefined) payload['description'] = category.description;
 
-    return this.http.put<CategoryApi>(`${this.apiUrl}/${id}`, payload).pipe(map(mapCategory));
+    return this.http.put<CategoryApi>(`${this.apiUrl}${id}`, payload).pipe(map(mapCategory));
   }
 
   deleteCategory(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}${id}`);
   }
 }
