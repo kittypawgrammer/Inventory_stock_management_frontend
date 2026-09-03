@@ -21,6 +21,7 @@ export class CategoryService extends ApiService {
     return this.http.get<Category>(this.buildUrl(`${this.endpoint}${id}`));
   }
 
+  // Builds the request body explicitly so only the two editable fields are sent.
   addCategory(category: Omit<Category, 'id' | 'created_at'>): Observable<Category> {
     return this.http.post<Category>(this.buildUrl(this.endpoint), {
       name: category.name,
@@ -28,6 +29,8 @@ export class CategoryService extends ApiService {
     });
   }
 
+  // Uses PUT but only includes the keys the caller actually changed, so unchanged
+  // fields keep their existing backend values (PATCH-like behaviour).
   updateCategory(id: number, category: Partial<Omit<Category, 'id' | 'created_at'>>): Observable<Category> {
     const payload: Record<string, string> = {};
     if (category.name !== undefined) payload['name'] = category.name;
