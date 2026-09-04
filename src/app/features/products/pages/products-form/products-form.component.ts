@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { ProductService, Product } from '../../../../core/services/product.service';
 import { CategoryService, Category } from '../../../../core/services/category.service';
@@ -23,9 +23,13 @@ export class ProductsFormComponent implements OnInit {
   submitting = false;
   errorMessage = '';
 
+  editMode = false;
+  productId: number | null = null;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private productService: ProductService,
     private categoryService: CategoryService,
     private supplierService: SupplierService
@@ -66,6 +70,31 @@ export class ProductsFormComponent implements OnInit {
       }
     });
 
+    // Check if editing an existing product
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.editMode = true;
+      this.productId = +idParam;
+
+      this.productService.getProductById(this.productId).subscribe({
+        next: (product) => {
+          this.productForm.patchValue({
+            name: product.name,
+            sku: product.sku,
+            category_id: product.category_id,
+            supplier_id: product.supplier_id,
+            unit_price: product.unit_price,
+            quantity_in_stock: product.quantity_in_stock,
+            reorder_level: product.reorder_level
+          });
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error(error);
+          this.errorMessage = 'Could not load product.';
+        }
+      });
+    }
+
   }
 
   onSubmit(): void {
@@ -83,22 +112,31 @@ export class ProductsFormComponent implements OnInit {
     const product: Omit<Product, 'id' | 'status'> =
       this.productForm.value;
 
-    // Call the service to add the product
-
-    this.productService.addProduct(product).subscribe({
-
-      next: () => {
-        this.router.navigate(['/products']);
-      },
-
-      error: (error: HttpErrorResponse) => {
-        console.error(error);
-
-        this.submitting = false;
-        this.errorMessage = 'Could not add product.';
-      }
-
-    });
+    if (this.editMode && this.productId) {
+      // Update existing product
+      this.productService.updateProduct(this.productId, product).subscribe({
+        next: () => {
+          this.router.navigate(['/products']);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error(error);
+          this.submitting = false;
+          this.errorMessage = 'Could not update product.';
+        }
+      });
+    } else {
+      // Add new product
+      this.productService.addProduct(product).subscribe({
+        next: () => {
+          this.router.navigate(['/products']);
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error(error);
+          this.submitting = false;
+          this.errorMessage = 'Could not add product.';
+        }
+      });
+    }
 
   }
 

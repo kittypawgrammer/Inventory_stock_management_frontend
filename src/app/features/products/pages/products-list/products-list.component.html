@@ -101,6 +101,7 @@
   <thead class="bg-slate-50 text-sm text-slate-600">
 
     <tr>
+      <th class="px-4 py-3 font-medium">ID</th>
       <th class="px-4 py-3 font-medium">Name</th>
       <th class="px-4 py-3 font-medium">SKU</th>
       <th class="px-4 py-3 font-medium">Category</th>
@@ -118,6 +119,10 @@
 
     <!-- Product Rows -->
     <tr *ngFor="let product of filteredProducts">
+
+      <td class="px-4 py-3 text-slate-500">
+        {{ product.id }}
+      </td>
 
       <td class="px-4 py-3 font-medium text-slate-900">
         {{ product.name }}
@@ -196,7 +201,7 @@
     <tr *ngIf="filteredProducts.length === 0">
 
       <td
-        colspan="8"
+        colspan="9"
         class="px-4 py-12 text-center text-sm text-slate-400"
       >
         No products found

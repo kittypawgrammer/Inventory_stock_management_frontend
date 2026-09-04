@@ -12,6 +12,7 @@ export class SignupComponent {
   username = '';
   password = '';
   confirmPassword = '';
+  role = 'STAFF';
   errorMessage = '';
 
   private readonly authService = inject(AuthService);

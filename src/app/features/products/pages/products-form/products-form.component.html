@@ -4,7 +4,7 @@
 
   <div class="flex items-center justify-between">
     <h1 class="text-3xl font-semibold text-slate-900">
-      Add Product
+      {{ editMode ? 'Edit Product' : 'Add Product' }}
     </h1>
 
 <button
@@ -214,7 +214,7 @@
       [disabled]="submitting"
       class="rounded-xl bg-blue-600 px-4 py-2.5 text-white"
     >
-      {{ submitting ? 'Saving...' : 'Save Product' }}
+      {{ submitting ? 'Saving...' : (editMode ? 'Update Product' : 'Save Product') }}
     </button>
 
   </div>

@@ -11,7 +11,7 @@ import {
   templateUrl: './categories-list.component.html',
   styleUrl: './categories-list.component.css'
 })
-export class CategoriesListComponent implements OnInit, OnDestroy {
+export class CategoriesListComponent implements OnInit {
 
   // Categories received from parent component
   @Input() categories: Category[] = [];
@@ -50,11 +50,6 @@ export class CategoriesListComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-
-    // Unsubscribe when component is destroyed
-    this.routeSubscription?.unsubscribe();
-  }
 
   // Filter categories based on search
   get filteredCategories(): Category[] {

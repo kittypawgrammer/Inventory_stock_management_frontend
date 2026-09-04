@@ -11,17 +11,23 @@ export interface Category {
 
 @Injectable({ providedIn: 'root' })
 export class CategoryService extends ApiService {
+  
   private readonly endpoint = '/api/v1/categories/';
+
+  //get all categories
 
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(this.buildUrl(this.endpoint));
   }
 
+  //get category by ID
+
   getCategoryById(id: number): Observable<Category> {
     return this.http.get<Category>(this.buildUrl(`${this.endpoint}${id}`));
   }
 
-  // Builds the request body explicitly so only the two editable fields are sent.
+  // add category
+
   addCategory(category: Omit<Category, 'id' | 'created_at'>): Observable<Category> {
     return this.http.post<Category>(this.buildUrl(this.endpoint), {
       name: category.name,
@@ -29,8 +35,8 @@ export class CategoryService extends ApiService {
     });
   }
 
-  // Uses PUT but only includes the keys the caller actually changed, so unchanged
-  // fields keep their existing backend values (PATCH-like behaviour).
+  //update category
+
   updateCategory(id: number, category: Partial<Omit<Category, 'id' | 'created_at'>>): Observable<Category> {
     const payload: Record<string, string> = {};
     if (category.name !== undefined) payload['name'] = category.name;

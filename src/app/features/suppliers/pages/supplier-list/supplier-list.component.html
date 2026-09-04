@@ -43,6 +43,7 @@
     <table class="min-w-full divide-y divide-slate-200 text-left">
       <thead class="bg-slate-50 text-sm text-slate-600">
         <tr>
+          <th class="px-4 py-3 font-medium">ID</th>
           <th class="px-4 py-3 font-medium">Supplier_Name</th>
           <th class="px-4 py-3 font-medium">Email</th>
           <th class="px-4 py-3 font-medium">Phone</th>
@@ -53,6 +54,7 @@
       </thead>
       <tbody class="divide-y divide-slate-200 bg-white text-sm text-slate-700">
         <tr *ngFor="let supplier of filteredSuppliers">
+          <td class="px-4 py-3 text-slate-500">{{ supplier.id }}</td>
           <td class="px-4 py-3">
             <div class="font-medium text-slate-900">{{ supplier.name }}</div>
           </td>
@@ -68,7 +70,7 @@
           </td>
         </tr>
         <tr *ngIf="filteredSuppliers.length === 0">
-          <td colspan="6" class="px-4 py-12 text-center text-sm text-slate-400">No suppliers found</td>
+          <td colspan="7" class="px-4 py-12 text-center text-sm text-slate-400">No suppliers found</td>
         </tr>
       </tbody>
     </table>
@@ -77,12 +79,6 @@
   <div class="border-t border-slate-200 px-5 py-2">
     <div class="flex flex-col gap-2 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
       <span>Showing {{ filteredSuppliers.length }} of {{ suppliers.length }} suppliers</span>
-      <div class="flex items-center gap-2">
-        <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Previous</button>
-        <button type="button" class="rounded-lg border border-slate-300 bg-slate-900 px-3 py-1.5 text-white">1</button>
-        <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-50">2</button>
-        <button type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-50">Next</button>
-      </div>
     </div>
   </div>
 </section>
