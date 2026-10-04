@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StockFlow Frontend Guide (feat/rolebased)</title>
+<style>
+:root{
+  --bg:#f6f7fb;--card:#fff;--ink:#1f2433;--muted:#5b6478;--line:#e3e6ef;
+  --brand:#4f46e5;--brand2:#eef0ff;--green:#0f9d58;--green2:#e7f6ee;
+  --amber:#b26a00;--amber2:#fff4e0;--red:#c62828;--red2:#fdecec;--code:#0f172a;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;font-size:15px}
+a{color:var(--brand)}
+header.hero{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:28px 20px}
+header.hero h1{margin:0 0 6px;font-size:26px}
+header.hero p{margin:0;opacity:.92}
+.pills{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.pill{background:rgba(255,255,255,.18);border-radius:999px;padding:3px 10px;font-size:12.5px}
+.wrap{display:flex;max-width:1280px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:flex-start;height:100vh;overflow:auto;width:250px;flex:0 0 250px;padding:18px 12px;border-right:1px solid var(--line);background:#fff}
+nav.toc b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:6px 8px 8px}
+nav.toc a{display:block;padding:6px 10px;border-radius:8px;text-decoration:none;color:var(--ink);font-size:14px}
+nav.toc a:hover{background:var(--brand2);color:var(--brand)}
+main{flex:1;min-width:0;padding:22px}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:20px}
+section h2{margin:0 0 4px;font-size:21px}
+section h2 .n{display:inline-block;background:var(--brand);color:#fff;border-radius:8px;padding:0 9px;margin-right:8px;font-size:15px;vertical-align:2px}
+.sub{color:var(--muted);margin:0 0 14px}
+h3{font-size:16.5px;margin:20px 0 8px}
+table{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:#f2f3f8;font-weight:600}
+.tbl{overflow-x:auto}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;background:#f1f2f7;padding:1px 5px;border-radius:5px}
+pre{background:var(--code);color:#e2e8f0;padding:14px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.5}
+pre code{background:none;padding:0;color:inherit}
+.c{color:#94a3b8}.k{color:#c4b5fd}.s{color:#86efac}.f{color:#7dd3fc}
+.callout{border-left:4px solid var(--brand);background:var(--brand2);padding:10px 14px;border-radius:8px;margin:10px 0}
+.callout.ok{border-color:var(--green);background:var(--green2)}
+.callout.warn{border-color:var(--amber);background:var(--amber2)}
+.callout.bad{border-color:var(--red);background:var(--red2)}
+.say{border-left:4px solid #7c3aed;background:#f5f0ff;padding:10px 14px;border-radius:8px;margin:10px 0;font-style:italic}
+.say:before{content:"Say to manager: ";font-style:normal;font-weight:700;color:#7c3aed}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+.card h4{margin:0 0 4px;font-size:15px}
+.card p{margin:0;color:var(--muted);font-size:13.5px}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:1px 7px;margin:1px 2px 1px 0}
+.SA{background:#fde68a;color:#7c4a00}.IM{background:#bfdbfe;color:#1e3a8a}.OM{background:#c7f9cc;color:#14532d}.IS{background:#e9d5ff;color:#581c87}.OS{background:#fecdd3;color:#881337}
+.yes{color:var(--green);font-weight:700}.no{color:#aab}
+/* flow boxes */
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:10px 0}
+.step{background:#fff;border:1.5px solid var(--brand);border-radius:10px;padding:8px 11px;font-size:13.5px;min-width:120px;max-width:230px}
+.step b{display:block;color:var(--brand);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.arrow{display:flex;align-items:center;padding:0 6px;color:var(--brand);font-weight:700;font-size:18px}
+.vflow{display:flex;flex-direction:column;align-items:flex-start;gap:0;margin:10px 0}
+.vflow .step{max-width:620px;width:100%}
+.vflow .down{padding:2px 0 2px 26px;color:var(--brand);font-weight:700}
+.step.g{border-color:var(--green)} .step.g b{color:var(--green)}
+.step.r{border-color:var(--red)} .step.r b{color:var(--red)}
+.step.a{border-color:var(--amber)} .step.a b{color:var(--amber)}
+details{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:#fff}
+details>summary{cursor:pointer;padding:12px 14px;font-weight:700;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary:before{content:"▸ ";color:var(--brand)}
+details[open]>summary:before{content:"▾ "}
+details>div{padding:0 16px 14px}
+.tree{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:#fbfbfe;border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;white-space:pre;line-height:1.6}
+.tree .d{color:var(--brand);font-weight:700}.tree .x{color:var(--muted)}
+.chain{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px 14px;overflow-x:auto;white-space:pre;line-height:1.65}
+.chain .m{color:#7dd3fc}.chain .h{color:#fbbf24}.chain .e{color:#86efac}.chain .c{color:#94a3b8}
+.states{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0}
+.st{border-radius:8px;padding:4px 9px;font-size:12.5px;font-weight:700;background:#eef2ff;color:#3730a3}
+.st.t{background:#dcfce7;color:#166534}.st.x{background:#fee2e2;color:#991b1b}.st.w{background:#fef3c7;color:#92400e}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 0 30px}
+@media (max-width:860px){
+  nav.toc{display:none}
+  main{padding:12px}
+  section{padding:16px}
+  .arrow{transform:rotate(90deg);width:100%;justify-content:flex-start;padding:2px 0 2px 30px}
+  .flow{flex-direction:column}
+  .step{max-width:none}
+  #mnav{display:block !important}
+}
+#mnav{display:none;position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:8px 12px}
+#mnav select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);font-size:15px}
+@media print{nav.toc,#mnav{display:none}section{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>StockFlow: Inventory &amp; Order Management Frontend</h1>
+  <p>A complete walkthrough of the Angular app on branch <b>feat/rolebased</b>: features, every file's job, how the flows work, which functions call which, and the important code.</p>
+  <div class="pills">
+    <span class="pill">Angular 17.3</span><span class="pill">NgModules + lazy loading</span><span class="pill">Signals</span><span class="pill">RxJS 7.8</span><span class="pill">Reactive Forms</span><span class="pill">Tailwind CSS</span><span class="pill">JWT + refresh cookie</span><span class="pill">RBAC + ABAC</span><span class="pill">41 REST APIs</span>
+  </div>
+</header>
+
+<div id="mnav">
+  <select onchange="location.hash=this.value">
+    <option value="">Jump to section…</option>
+    <option value="#overview">1. Overview</option>
+    <option value="#roles">2. Roles &amp; access</option>
+    <option value="#files">3. Every file and its job</option>
+    <option value="#startup">4. App startup flow</option>
+    <option value="#routing">5. Routing &amp; guards</option>
+    <option value="#auth">6. Login, tokens &amp; refresh</option>
+    <option value="#abac">7. Task-based access (ABAC)</option>
+    <option value="#request">8. Life of an HTTP request</option>
+    <option value="#features">9. Features one by one</option>
+    <option value="#layout">10. Layout, sidebar &amp; global search</option>
+    <option value="#apis">11. All 41 APIs</option>
+    <option value="#code">12. Important code</option>
+    <option value="#issues">13. Known issues &amp; fixes</option>
+    <option value="#demo">14. Demo plan &amp; Q&amp;A</option>
+  </select>
+</div>
+
+<div class="wrap">
+<nav class="toc">
+  <b>Contents</b>
+  <a href="#overview">1. Overview</a>
+  <a href="#roles">2. Roles &amp; access</a>
+  <a href="#files">3. Every file and its job</a>
+  <a href="#startup">4. App startup flow</a>
+  <a href="#routing">5. Routing &amp; guards</a>
+  <a href="#auth">6. Login, tokens &amp; refresh</a>
+  <a href="#abac">7. Task-based access (ABAC)</a>
+  <a href="#request">8. Life of an HTTP request</a>
+  <a href="#features">9. Features one by one</a>
+  <a href="#layout">10. Layout &amp; global search</a>
+  <a href="#apis">11. All 41 APIs</a>
+  <a href="#code">12. Important code</a>
+  <a href="#issues">13. Known issues &amp; fixes</a>
+  <a href="#demo">14. Demo plan &amp; Q&amp;A</a>
+</nav>
+
+<main>
+
+<!-- 1 OVERVIEW -->
+<section id="overview">
+  <h2><span class="n">1</span>Overview</h2>
+  <p class="sub">What the app is, in one look.</p>
+  <p>StockFlow is a Single Page Application for a small company. It manages <b>stock</b> (products, categories, suppliers), <b>sales</b> (customers, orders, order status), and <b>people</b> (users, roles and delegated tasks). It also asks a machine-learning model on the backend to <b>predict how many days an order will take</b>.</p>
+  <p>The frontend talks to a FastAPI backend over REST at <code>http://localhost:8000/api/v1/</code>.</p>
+
+  <div class="grid">
+    <div class="card"><h4>📦 Inventory</h4><p>Products, categories and suppliers. Full CRUD, plus a stock IN/OUT modal with a reason.</p></div>
+    <div class="card"><h4>🧾 Sales</h4><p>Customers and multi-line orders. Orders move through an 11-status state machine.</p></div>
+    <div class="card"><h4>🤖 AI predictions</h4><p>Predicts delivery days for an order, or for a manual "what-if" scenario.</p></div>
+    <div class="card"><h4>✅ Tasks</h4><p>Managers assign tasks to staff. A task gives staff edit rights on that one record.</p></div>
+    <div class="card"><h4>👥 Users</h4><p>The Super Admin changes user roles. A role change forces a fresh login.</p></div>
+    <div class="card"><h4>📊 Dashboard</h4><p>Stock value, low/out-of-stock alerts, recent orders and my tasks. It is role-aware.</p></div>
+  </div>
+
+  <h3>Tech stack and why</h3>
+  <div class="tbl"><table>
+    <tr><th>Tech</th><th>Why it is used</th></tr>
+    <tr><td>Angular 17 (NgModules)</td><td>A full framework: router, forms, HTTP and dependency injection. Good for a role-heavy admin app.</td></tr>
+    <tr><td>Lazy-loaded feature modules</td><td>Each feature is its own JS chunk, downloaded only when the user opens it. 9 lazy modules.</td></tr>
+    <tr><td>Angular Signals</td><td>The logged-in user is a <code>signal</code>. Menus and buttons update automatically on login, logout or a role change.</td></tr>
+    <tr><td>RxJS</td><td>HTTP calls. <code>forkJoin</code> runs calls in parallel, <code>expand</code> loads every page, and <code>shareReplay</code> shares one token refresh.</td></tr>
+    <tr><td>Reactive Forms</td><td>All forms (product, category, supplier, customer, order, task, prediction), with validators.</td></tr>
+    <tr><td>Tailwind CSS</td><td>Utility classes give a fast, responsive UI.</td></tr>
+    <tr><td>Functional guards and interceptor</td><td>The modern Angular style: plain functions that use <code>inject()</code>.</td></tr>
+  </table></div>
+
+  <div class="say">It's an inventory and order management frontend in Angular 17 with Tailwind. It has five roles and two layers of security: role-based access for pages, and task-based access for individual records. Login uses a JWT that refreshes silently, and every feature is lazy loaded.</div>
+</section>
+
+<!-- 2 ROLES -->
+<section id="roles">
+  <h2><span class="n">2</span>Roles &amp; access</h2>
+  <p class="sub">Five roles. The role always comes from the JWT access token.</p>
+  <div class="tbl"><table>
+    <tr><th>Role</th><th>Short</th><th>What they do</th></tr>
+    <tr><td>SUPER_ADMIN</td><td><span class="tag SA">SA</span></td><td>Sees everything. Manages users and roles. Assigns tasks to anyone.</td></tr>
+    <tr><td>INVENTORY_MANAGER</td><td><span class="tag IM">IM</span></td><td>Full write on products, categories and suppliers. Views orders and predictions. Assigns tasks to inventory staff.</td></tr>
+    <tr><td>ORDER_MANAGER</td><td><span class="tag OM">OM</span></td><td>Full write on customers and orders. Views products (read only). Assigns tasks to order staff.</td></tr>
+    <tr><td>INVENTORY_STAFF</td><td><span class="tag IS">IS</span></td><td>Views inventory. Can edit a record only when a manager gives them an active task for it.</td></tr>
+    <tr><td>ORDER_STAFF</td><td><span class="tag OS">OS</span></td><td>Views orders, customers and predictions. Moves order status. Creates or edits only through tasks.</td></tr>
+  </table></div>
+
+  <h3>Who can open which page</h3>
+  <div class="tbl"><table>
+    <tr><th>Page</th><th>SA</th><th>IM</th><th>OM</th><th>IS</th><th>OS</th></tr>
+    <tr><td>Dashboard</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Products</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">view</td><td class="yes">✓</td><td class="no">–</td></tr>
+    <tr><td>Categories</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">–</td><td class="yes">✓</td><td class="no">–</td></tr>
+    <tr><td>Suppliers</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">–</td><td class="yes">✓</td><td class="no">–</td></tr>
+    <tr><td>Orders</td><td class="yes">✓</td><td class="yes">view</td><td class="yes">✓</td><td class="no">–</td><td class="yes">✓</td></tr>
+    <tr><td>Customers</td><td class="yes">✓</td><td class="no">–</td><td class="yes">✓</td><td class="no">–</td><td class="yes">✓</td></tr>
+    <tr><td>Predictions</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">–</td><td class="yes">✓</td></tr>
+    <tr><td>My Tasks</td><td class="no">hidden</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+    <tr><td>Manage Tasks</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">–</td><td class="no">–</td></tr>
+    <tr><td>Users</td><td class="yes">✓</td><td class="no">–</td><td class="no">–</td><td class="no">–</td><td class="no">–</td></tr>
+  </table></div>
+
+  <div class="grid">
+    <div class="card"><h4>RBAC: role-based</h4><p>The role decides which <b>pages and menu items</b> you get. This is enforced by <code>roleGuard</code> and the sidebar's <code>canViewX()</code> helpers.</p></div>
+    <div class="card"><h4>ABAC: attribute-based</h4><p>For staff, an active <b>task</b> decides which <b>records</b> they may edit. This is enforced by <code>canEditRecord(tasks, type, id)</code>.</p></div>
+  </div>
+</section>
+
+<!-- 3 FILES -->
+<section id="files">
+  <h2><span class="n">3</span>Every file and its job</h2>
+  <p class="sub">All paths are under <code>src/</code>. Every feature module also has a <code>*-routing.module.ts</code> for its routes.</p>
+
+<div class="tree"><span class="d">src/</span>
+├─ main.ts                         <span class="x">Starts the app: bootstrapModule(AppModule)</span>
+├─ environments/environment*.ts    <span class="x">apiUrl = http://localhost:8000/api/v1/</span>
+└─ <span class="d">app/</span>
+   ├─ app.module.ts                <span class="x">Root module: router, HttpClient + interceptor, APP_INITIALIZER</span>
+   ├─ app.routes.ts                <span class="x">Top routes: '' → AuthModule, '' + authGuard → LayoutModule, ** → login</span>
+   ├─ app.component.*              <span class="x">Only &lt;router-outlet&gt;</span>
+   ├─ app.config.ts                <span class="x">Unused (leftover standalone config)</span>
+   │
+   ├─ <span class="d">auth/</span>
+   │  ├─ auth.module / auth-routing     <span class="x">/login and /signup</span>
+   │  ├─ guards/auth.guard.ts           <span class="x">"Is there a token?" Otherwise → /login?returnUrl=…</span>
+   │  ├─ guards/role.guard.ts           <span class="x">"Is my role in route.data.roles?"</span>
+   │  ├─ interceptors/auth.interceptor  <span class="x">Adds the Bearer token; on a 401: refresh + replay</span>
+   │  ├─ pages/login                    <span class="x">Login form → startSession → /dashboard</span>
+   │  ├─ pages/signup                   <span class="x">Register form → POST auth/register → /login</span>
+   │  ├─ utils/auth-state.ts            <span class="x">Session SIGNAL, localStorage, JWT decode, start/restore/clear session</span>
+   │  ├─ utils/role-model.ts            <span class="x">AppRole type, role lists, parseRole()</span>
+   │  └─ utils/role-auth.ts             <span class="x">canViewX / canManageX helpers + ABAC (canEditRecord, canCreateRecord)</span>
+   │
+   ├─ <span class="d">layout/</span>
+   │  ├─ layout-routing.module.ts  <span class="x">ALL logged-in routes + roles + lazy loadChildren</span>
+   │  ├─ layout/                   <span class="x">The shell: sidebar + topbar + &lt;router-outlet&gt;</span>
+   │  ├─ sidebar/                  <span class="x">Role-based menu, collapsible sections, Logout</span>
+   │  └─ topbar/                   <span class="x">Role badge + global search with suggestions</span>
+   │
+   ├─ <span class="d">features/</span>                    <span class="x">One lazy module per feature</span>
+   │  ├─ dashboard/                <span class="x">Summary cards, stock alerts, recent orders, my tasks</span>
+   │  ├─ products/                 <span class="x">Parent + pages/products-list (table, stock modal) + pages/products-form</span>
+   │  ├─ categories/               <span class="x">Parent + categories-list + categories-form</span>
+   │  ├─ suppliers/                <span class="x">Parent + supplier-list + suplier-form</span>
+   │  ├─ customers/                <span class="x">One component, create/edit in a modal</span>
+   │  ├─ orders/                   <span class="x">One component: create order, details, status state machine</span>
+   │  ├─ predictions/              <span class="x">Order-based and manual ML predictions</span>
+   │  ├─ tasks/                    <span class="x">pages/my-tasks, pages/manage-tasks, components/task-form</span>
+   │  ├─ users/                    <span class="x">pages/user-management (change roles)</span>
+   │  └─ features.module.ts        <span class="x">Unused (empty module)</span>
+   │
+   └─ <span class="d">services/</span>                    <span class="x">One service per backend resource, all providedIn: 'root'</span>
+      ├─ api.service.ts            <span class="x">Base class: buildUrl() + fetchAll() (loads every page)</span>
+      ├─ auth.service.ts           <span class="x">login, signup, refreshToken, logout</span>
+      ├─ session.service.ts        <span class="x">init on startup, single-flight refresh, 60 s early refresh timer</span>
+      ├─ product / category / supplier / customers / order .service.ts
+      ├─ prediction / task / user / dashboard .service.ts</div>
+
+  <h3>The 3 layers (how the code is split)</h3>
+  <div class="flow">
+    <div class="step"><b>Component</b>Shows the UI, holds page state, and calls a service</div><div class="arrow">→</div>
+    <div class="step"><b>Service</b>One per resource, extends ApiService, and returns an Observable</div><div class="arrow">→</div>
+    <div class="step"><b>HttpClient + interceptor</b>Adds the token and handles 401s</div><div class="arrow">→</div>
+    <div class="step g"><b>FastAPI backend</b>/api/v1/…</div>
+  </div>
+  <p>The access rules live separately, as <b>pure functions</b> in <code>role-auth.ts</code>. Any component, guard or the sidebar can use them.</p>
+</section>
+
+<!-- 4 STARTUP -->
+<section id="startup">
+  <h2><span class="n">4</span>App startup flow</h2>
+  <p class="sub">What happens when the browser opens the app.</p>
+  <div class="vflow">
+    <div class="step"><b>1. main.ts</b><code>platformBrowserDynamic().bootstrapModule(AppModule)</code></div><div class="down">↓</div>
+    <div class="step"><b>2. auth-state.ts loads</b>It reads <code>localStorage['stockflow_user_data']</code>. If the saved token is valid and not expired, it fills the <code>session</code> signal. Otherwise the signal is <code>null</code>.</div><div class="down">↓</div>
+    <div class="step"><b>3. AppModule</b>Sets up the router, <code>provideHttpClient(withInterceptors([authInterceptor]))</code>, and <code>APP_INITIALIZER</code>.</div><div class="down">↓</div>
+    <div class="step"><b>4. APP_INITIALIZER → SessionService.init()</b>Angular waits for this before routing. If there is a token, it's done. Otherwise it tries <code>refresh()</code> through the cookie.</div><div class="down">↓</div>
+    <div class="step"><b>5. Router resolves the URL</b><code>authGuard</code> → <code>LayoutModule</code> → <code>roleGuard</code> → the lazy feature module → the component.</div><div class="down">↓</div>
+    <div class="step g"><b>6. Page renders</b>The component's <code>ngOnInit</code> calls services, which call APIs, and the data appears.</div>
+  </div>
+</section>
+
+<!-- 5 ROUTING -->
+<section id="routing">
+  <h2><span class="n">5</span>Routing &amp; guards</h2>
+  <p class="sub">Two areas: public (login/signup) and the logged-in shell.</p>
+<div class="tree">/                     → AuthModule → redirect /login
+/login, /signup       public
+/**                   → /login
+<span class="d">[authGuard] LayoutComponent (sidebar + topbar)</span>
+  /dashboard          <span class="tag SA">SA</span><span class="tag IM">IM</span><span class="tag OM">OM</span><span class="tag IS">IS</span><span class="tag OS">OS</span>
+  /products (+add, edit/:id)   <span class="tag SA">SA</span><span class="tag IM">IM</span><span class="tag IS">IS</span><span class="tag OM">OM</span>
+  /categories (+add, edit/:id) <span class="tag SA">SA</span><span class="tag IM">IM</span><span class="tag IS">IS</span>
+  /suppliers (+add, edit/:id)  <span class="tag SA">SA</span><span class="tag IM">IM</span><span class="tag IS">IS</span>
+  /orders             <span class="tag SA">SA</span><span class="tag OM">OM</span><span class="tag OS">OS</span><span class="tag IM">IM</span>
+  /customers          <span class="tag SA">SA</span><span class="tag OM">OM</span><span class="tag OS">OS</span>
+  /predictions        <span class="tag SA">SA</span><span class="tag OM">OM</span><span class="tag OS">OS</span><span class="tag IM">IM</span>
+  /tasks              all roles
+    /tasks/manage     <span class="tag SA">SA</span><span class="tag IM">IM</span><span class="tag OM">OM</span>
+  /admin/users        <span class="tag SA">SA</span></div>
+
+  <h3>How a page is opened (function by function)</h3>
+  <div class="flow">
+    <div class="step"><b>URL</b>/products</div><div class="arrow">→</div>
+    <div class="step"><b>authGuard</b><code>getAccessToken()</code>? If not, return a UrlTree to /login?returnUrl</div><div class="arrow">→</div>
+    <div class="step"><b>LayoutModule</b>The shell loads</div><div class="arrow">→</div>
+    <div class="step"><b>roleGuard</b><code>currentRole()</code> must be in <code>route.data.roles</code></div><div class="arrow">→</div>
+    <div class="step"><b>loadChildren</b>Downloads ProductsModule</div><div class="arrow">→</div>
+    <div class="step g"><b>ProductsComponent</b>ngOnInit loads the data</div>
+  </div>
+
+  <div class="callout"><b>UrlTree in simple words:</b> the guard does not navigate by itself. It hands the router a "go here instead" address, such as <code>/login?returnUrl=/products</code>. The router cancels the current navigation and goes there in one clean step.</div>
+
+<pre><code><span class="c">// auth.guard.ts</span>
+<span class="k">export const</span> <span class="f">authGuard</span>: CanActivateFn = (route, state) =&gt; {
+  <span class="k">const</span> router = inject(Router);
+  <span class="k">if</span> (getAccessToken()) { <span class="k">return true</span>; }
+  <span class="k">return</span> router.createUrlTree([<span class="s">'/login'</span>], { queryParams: { returnUrl: state.url } });
+};
+
+<span class="c">// role.guard.ts</span>
+<span class="k">export const</span> <span class="f">roleGuard</span>: CanActivateFn = (route) =&gt; {
+  <span class="k">const</span> userRole = currentRole();
+  <span class="k">const</span> allowed = (route.data[<span class="s">'roles'</span>] || []).map(parseRole).filter(r =&gt; r !== <span class="k">null</span>);
+  <span class="k">if</span> (userRole !== <span class="k">null</span> &amp;&amp; allowed.includes(userRole)) { <span class="k">return true</span>; }
+  <span class="k">return</span> inject(Router).createUrlTree([<span class="s">'/login'</span>]);
+};</code></pre>
+</section>
+
+<!-- 6 AUTH -->
+<section id="auth">
+  <h2><span class="n">6</span>Login, tokens &amp; refresh</h2>
+  <p class="sub">The most important technical part to explain.</p>
+
+  <h3>Where the tokens live</h3>
+  <div class="tbl"><table>
+    <tr><th>Token</th><th>Stored in</th><th>Why</th></tr>
+    <tr><td>Access token (JWT, short-lived)</td><td><code>localStorage['stockflow_user_data']</code> and the <code>session</code> signal</td><td>Needed in the <code>Authorization</code> header, so JavaScript must be able to read it.</td></tr>
+    <tr><td>Refresh token (long-lived)</td><td>An <b>httpOnly cookie</b> set by the backend</td><td>JavaScript can't read it, so an XSS bug cannot steal it. It's sent automatically with <code>withCredentials</code>.</td></tr>
+  </table></div>
+
+  <h3>Login: function call chain</h3>
+<div class="chain"><span class="m">LoginComponent.onSubmit()</span>
+  └─ <span class="m">AuthService.login</span>({email, password})
+       └─ <span class="h">POST</span> <span class="e">auth/login</span>   <span class="c">(withCredentials → the backend also sets the refresh cookie)</span>
+  └─ <span class="m">startSession</span>(access_token, role, username, user_id)   <span class="c">auth-state.ts</span>
+       ├─ rejects the token if it is missing or expired
+       ├─ <span class="m">roleFromToken</span>(token)   <span class="c">decodes the JWT; the JWT role wins over the response role</span>
+       ├─ localStorage.setItem('stockflow_user_data', …)
+       └─ session.set(user)     <span class="c">→ the signal updates → the sidebar, buttons and guards react</span>
+  └─ <span class="c">SessionService effect() sees the new token →</span> <span class="m">armFor(token)</span> <span class="c">→ timer = expiry − 60 s</span>
+  └─ router.navigate(['/dashboard'])</div>
+
+  <h3>The session signal (auth-state.ts)</h3>
+  <div class="grid">
+    <div class="card"><h4>Write: private</h4><p>Only <code>startSession</code>, <code>restoreSession</code> and <code>clearSession</code> call <code>session.set</code>.</p></div>
+    <div class="card"><h4>Read: public</h4><p><code>currentUser()</code> is read-only. All the role helpers read it.</p></div>
+    <div class="card"><h4>Why a signal?</h4><p>Simple reads with no subscriptions to clean up, and an <code>effect()</code> can re-arm the refresh timer automatically.</p></div>
+  </div>
+
+  <h3>Two ways the token gets refreshed</h3>
+  <div class="grid">
+    <div class="card"><h4>⏰ Proactive (normal case)</h4><p>An <code>effect()</code> in SessionService watches the token. <code>armFor()</code> sets <code>setTimeout</code> for <b>60 s before expiry</b>, then calls <code>refresh()</code>. Users almost never see a 401.</p></div>
+    <div class="card"><h4>🛟 Reactive (backup)</h4><p>If any API still returns <b>401</b>, the interceptor calls <code>session.refresh()</code> and <b>replays</b> the original request with the new token.</p></div>
+  </div>
+
+  <h3>The interceptor flow (auth.interceptor.ts)</h3>
+  <div class="vflow">
+    <div class="step"><b>Every request</b>An auth URL (login, register, refresh, logout) gets only <code>withCredentials</code>. Every other URL gets <code>withBearer(req, token)</code>, which adds the <code>Authorization: Bearer …</code> header and <code>withCredentials</code>.</div><div class="down">↓</div>
+    <div class="step a"><b>Response is a 401 on a non-auth URL?</b>If it's any other error, or a 401 from an auth URL, it is rethrown. No loop.</div><div class="down">↓ yes</div>
+    <div class="step"><b>session.refresh()</b>A single shared call to <code>POST auth/refresh</code> (sends the cookie).</div><div class="down">↓</div>
+    <div class="step g"><b>Success → switchMap</b>Replays the original request once with the new token. The component never notices.</div>
+    <div class="down">or</div>
+    <div class="step r"><b>Failure → catchError</b>Navigates to <code>/login?reason=session-changed&amp;returnUrl=…</code> and rethrows.</div>
+  </div>
+
+  <h3>Single-flight refresh with shareReplay</h3>
+  <p>Suppose the dashboard fires 5 calls and all 5 get a 401. Without protection that would mean 5 refresh calls. Here <code>refresh()</code> stores one <code>inFlight</code> observable, and <code>shareReplay</code> shares that one HTTP result with all 5 callers. So there is <b>one refresh</b>, and all 5 requests are replayed.</p>
+<pre><code><span class="c">// session.service.ts</span>
+<span class="f">refresh</span>(): Observable&lt;string&gt; {
+  <span class="k">if</span> (!<span class="k">this</span>.inFlight) { <span class="k">this</span>.inFlight = <span class="k">this</span>.requestRefresh(); }
+  <span class="k">return this</span>.inFlight;                         <span class="c">// everyone gets the SAME observable</span>
+}
+<span class="k">private</span> <span class="f">requestRefresh</span>() {
+  <span class="k">return this</span>.authService.refreshToken().pipe(      <span class="c">// POST auth/refresh</span>
+    map(r =&gt; { <span class="k">if</span> (!restoreSession(r.access_token)) <span class="k">throw</span> …; <span class="k">return</span> r.access_token; }),
+    catchError(err =&gt; { clearSession(); <span class="k">return</span> throwError(() =&gt; err); }),
+    finalize(() =&gt; { <span class="k">this</span>.inFlight = <span class="k">null</span>; }),       <span class="c">// ready for the next refresh</span>
+    shareReplay({ bufferSize: 1, refCount: <span class="k">false</span> })   <span class="c">// 1 HTTP call, shared result</span>
+  );
+}</code></pre>
+  <div class="callout ok"><b>Role-change safety:</b> <code>restoreSession()</code> rejects a refreshed token whose role differs from the stored role. So if an admin changes your role, your next refresh ends the session and you log in again with the right menus.</div>
+
+  <h3>Logout: 3 ways a session ends</h3>
+  <div class="tbl"><table>
+    <tr><th>Trigger</th><th>Function</th><th>What happens</th></tr>
+    <tr><td>User clicks Logout</td><td><code>SidebarComponent.logout()</code></td><td><code>POST auth/logout</code>, then <code>clearSession()</code> and /login. This happens on success <b>and</b> on error.</td></tr>
+    <tr><td>Admin changes their own role</td><td><code>UserManagementComponent.changeRole</code></td><td><code>clearSession()</code>, then /login?reason=role-changed</td></tr>
+    <tr><td>Refresh fails</td><td>The interceptor or <code>SessionService.endSession()</code></td><td>The session is cleared, then /login?reason=session-changed</td></tr>
+  </table></div>
+</section>
+
+<!-- 7 ABAC -->
+<section id="abac">
+  <h2><span class="n">7</span>Task-based access (ABAC)</h2>
+  <p class="sub">How a staff member gets permission to edit one specific record.</p>
+  <div class="flow">
+    <div class="step"><b>Manager</b>Creates a task: "Fix price of Mouse", target_type = PRODUCT, target_id = Mouse's id</div><div class="arrow">→</div>
+    <div class="step"><b>Staff opens Products</b>The page calls <code>TaskService.getMyTasks()</code> (GET tasks/my)</div><div class="arrow">→</div>
+    <div class="step"><b>For each row</b><code>canEditRecord(myTasks, 'PRODUCT', id)</code></div><div class="arrow">→</div>
+    <div class="step g"><b>Result</b>Edit, stock and delete buttons show <b>only on Mouse</b></div><div class="arrow">→</div>
+    <div class="step r"><b>Task COMPLETED</b>The rights disappear automatically</div>
+  </div>
+<pre><code><span class="c">// role-auth.ts</span>
+<span class="k">function</span> <span class="f">activeTargets</span>(tasks: Task[]): Set&lt;string&gt; {
+  <span class="c">// skip COMPLETED, skip tasks without a target_id, skip target_type NONE</span>
+  set.add(<span class="s">`${task.target_type}:${task.target_id}`</span>);      <span class="c">// e.g. "PRODUCT:42"</span>
+}
+<span class="k">export function</span> <span class="f">canEditRecord</span>(tasks, targetType, targetId): boolean {
+  <span class="k">if</span> (!isWorker()) <span class="k">return false</span>;
+  <span class="k">return</span> activeTargets(tasks).has(<span class="s">`${targetType}:${targetId}`</span>);
+}
+
+<span class="c">// products-list.component.ts: managers OR a task on this record</span>
+<span class="f">canEditRecord</span>(product: Product): boolean {
+  <span class="k">return this</span>.canManage || canEditByTasks(<span class="k">this</span>.myTasks, <span class="s">'PRODUCT'</span>, product.id);
+}</code></pre>
+  <div class="tbl"><table>
+    <tr><th>Page</th><th>Create button shown when</th><th>Edit shown when</th></tr>
+    <tr><td>Products</td><td>Manager, or an active PRODUCT task</td><td>Manager, or a task on that product</td></tr>
+    <tr><td>Categories</td><td>Manager, or an active CATEGORY task</td><td>Manager, or a task on that category</td></tr>
+    <tr><td>Suppliers</td><td>Manager, or an active SUPPLIER task</td><td>Manager, or a task on that supplier</td></tr>
+    <tr><td>Customers</td><td>Manager, or an active CUSTOMER task</td><td>Manager, or a task on that customer</td></tr>
+    <tr><td>Orders</td><td>Manager, or an active ORDER task</td><td>Status change: by role (SA, OM, OS)</td></tr>
+  </table></div>
+  <div class="callout warn"><b>Be honest if asked:</b> this is UI-level control, meaning it hides buttons. The backend must check the same rules on every write. "The frontend is for user experience; the backend is the security boundary."</div>
+</section>
+
+<!-- 8 REQUEST -->
+<section id="request">
+  <h2><span class="n">8</span>Life of an HTTP request</h2>
+  <p class="sub">Example: opening the Products page.</p>
+<div class="chain"><span class="m">ProductsComponent.ngOnInit()</span>
+  ├─ <span class="m">loadMyTasks()</span>          <span class="c">(staff only)</span> → TaskService.getMyTasks()    → <span class="h">GET</span> <span class="e">tasks/my</span>
+  ├─ <span class="m">getProducts()</span>          → ProductService.getProducts({page, pageSize:10}) → <span class="h">GET</span> <span class="e">products/?page=1&amp;page_size=10</span>
+  └─ <span class="m">loadAllProducts()</span>      → ProductService.getAllProducts() → ApiService.<span class="m">fetchAll</span>()
+                                 → <span class="h">GET</span> <span class="e">products/?page=1&amp;page_size=100</span>, page 2, … until the last page
+
+each HttpClient call → <span class="m">authInterceptor</span> → adds "Authorization: Bearer &lt;token&gt;" → FastAPI
+                                ↳ 401? → SessionService.refresh() → <span class="h">POST</span> <span class="e">auth/refresh</span> → replay</div>
+
+  <h3>Why two lists on each page?</h3>
+  <div class="tbl"><table>
+    <tr><th>Variable</th><th>Loaded with</th><th>Used for</th></tr>
+    <tr><td><code>products</code></td><td><code>getProducts({page, pageSize:10})</code></td><td>The normal paged table (server paging)</td></tr>
+    <tr><td><code>allProducts</code></td><td><code>getAllProducts()</code> (every page)</td><td>Search in the browser, counts and ABAC checks</td></tr>
+  </table></div>
+
+  <h3>fetchAll: reading every page</h3>
+<pre><code><span class="c">// api.service.ts</span>
+<span class="k">protected</span> <span class="f">fetchAll</span>&lt;T&gt;(requestPage, pageSize = <span class="s">100</span>): Observable&lt;T[]&gt; {
+  <span class="k">return</span> requestPage(<span class="s">1</span>, pageSize).pipe(
+    expand(res =&gt; res.page &lt; res.total_pages ? requestPage(res.page + <span class="s">1</span>, pageSize) : EMPTY),  <span class="c">// keep asking for the next page</span>
+    reduce((all, res) =&gt; all.concat(res.items), [])                                         <span class="c">// join them into one array</span>
+  );
+}</code></pre>
+  <p>Every list API returns the same envelope: <code>{ items, total, page, page_size, total_pages }</code>.</p>
+</section>
+
+<!-- 9 FEATURES -->
+<section id="features">
+  <h2><span class="n">9</span>Features one by one</h2>
+  <p class="sub">Click a feature to open it. Each one shows its files, function call chain, APIs and talking points.</p>
+
+  <details open><summary>📊 Dashboard (/dashboard): all roles</summary><div>
+    <p><b>Files:</b> <code>features/dashboard/dashboard.component.ts</code> (+ a spec with 11 tests). <b>Services:</b> Dashboard, Product, Order, Task.</p>
+    <div class="tbl"><table>
+      <tr><th>Block</th><th>Shown when</th><th>Call</th></tr>
+      <tr><td>4 cards: products, stock value (₹), low stock, out of stock</td><td>Always</td><td><code>DashboardService.getSummary()</code> → GET products/summary</td></tr>
+      <tr><td>Stock alerts (top 5)</td><td><code>canViewProducts</code></td><td><code>forkJoin</code> of 2 × <code>getProducts({stockStatus})</code></td></tr>
+      <tr><td>Recent orders (5)</td><td><code>canViewOrders</code></td><td><code>getOrders({page:1, pageSize:5})</code></td></tr>
+      <tr><td>My tasks (5)</td><td>Any role except SA</td><td><code>getMyTasks()</code></td></tr>
+    </table></div>
+    <p><b>Smart detail:</b> if the backend ignores the stock filter, <code>isFilteredByStatus</code> detects it. The code then loads 100 products and filters them in the browser. A unit test covers this.</p>
+    <div class="say">The dashboard is role-aware. Everyone sees the summary, but stock alerts and recent orders only appear for roles allowed to see them.</div>
+  </div></details>
+
+  <details><summary>📦 Products (/products, /products/add, /products/edit/:id)</summary><div>
+    <div class="tbl"><table>
+      <tr><th>File</th><th>Job</th></tr>
+      <tr><td><code>products.component.ts</code> (parent)</td><td>Loads the page, all products and my tasks. Handles paging (<code>goToPage</code>) and counts (<code>countByStatus</code>).</td></tr>
+      <tr><td><code>pages/products-list</code> (child)</td><td>Table, search, status filter, stock IN/OUT modal and delete. It gets its data through <code>@Input</code>.</td></tr>
+      <tr><td><code>pages/products-form</code></td><td>Add and edit form with validators.</td></tr>
+      <tr><td><code>services/product.service.ts</code></td><td>All product HTTP calls.</td></tr>
+    </table></div>
+    <h3>Stock adjust: call chain</h3>
+<div class="chain"><span class="m">openAdjust(product)</span>          <span class="c">opens the modal, operation = IN</span>
+<span class="m">onOperationChange('OUT')</span>     <span class="c">switches to OUT</span>
+<span class="m">submitAdjust()</span>
+  └─ ProductService.<span class="m">adjustStock</span>(id, {quantity, operation, reason})
+       └─ <span class="h">PATCH</span> <span class="e">products/{id}/stock</span>
+  └─ replaces the row with the server response + toast "Stock added/deducted successfully."</div>
+    <h3>Add / edit: call chain</h3>
+<div class="chain"><span class="m">ngOnInit</span> → loadCategories() + loadSuppliers() + <span class="m">checkEditMode()</span>
+           + watchCategorySelection() + watchSupplierSelection()   <span class="c">// typed name → fills the id</span>
+edit mode → ProductService.<span class="m">getProductById</span>(id) → <span class="h">GET</span> <span class="e">products/{id}</span> → patchValue
+<span class="m">onSubmit()</span> → form.<span class="m">getRawValue()</span>   <span class="c">// includes the disabled id fields</span>
+   add  → <span class="h">POST</span> <span class="e">products/</span>      edit → <span class="h">PUT</span> <span class="e">products/{id}</span>   → navigate /products</div>
+    <p><b>Validators:</b> name, SKU, category and supplier are required. <code>unit_price</code> must be ≥ 0. Quantity and reorder level are checked by a custom <code>nonNegativeInteger</code> validator.</p>
+    <div class="say">Stock is never typed in by hand in the list. The modal sends the quantity, IN or OUT, and a reason, so the backend can keep an audit trail and refuse negative stock.</div>
+  </div></details>
+
+  <details><summary>🗂️ Categories (/categories): SA, IM, IS</summary><div>
+    <p>Same parent + list + form pattern as Products.</p>
+    <ul>
+      <li><b>Parent:</b> <code>getCategories({page, pageSize:10})</code> + <code>getAllCategories()</code> + <code>getMyTasks()</code></li>
+      <li><b>List:</b> search over <code>allCategories</code>. Edit is gated by a CATEGORY task. Delete asks for confirmation, then calls DELETE categories/{id}.</li>
+      <li><b>Form:</b> <code>name</code> is required with at least 2 characters. <code>description</code> is required with at least 10 characters. Saving calls POST or PUT categories/.</li>
+    </ul>
+  </div></details>
+
+  <details><summary>🚚 Suppliers (/suppliers): SA, IM, IS</summary><div>
+    <ul>
+      <li><b>Pattern:</b> parent + <code>supplier-list</code> + <code>suplier-form</code> (the folder name is spelled that way in the code).</li>
+      <li><b>Form validators:</b> name (at least 2 characters), <code>contact_email</code> (email format), <code>phone</code> (exactly 10 digits, <code>^\d{10}$</code>), address (at most 255 characters).</li>
+      <li><b>APIs:</b> GET/POST suppliers/, GET/PUT/DELETE suppliers/{id}</li>
+    </ul>
+  </div></details>
+
+  <details><summary>👤 Customers (/customers): SA, OM, OS</summary><div>
+    <ul>
+      <li><b>Structure:</b> a single component. Create and edit happen in a <b>modal</b> on the same page.</li>
+      <li><b>Search:</b> over <code>allCustomers</code>, matching name, email, phone and address.</li>
+      <li><b>save():</b> trims every field and lower-cases the email. It calls POST customers/ or PUT customers/{id}, then reloads both lists.</li>
+      <li><b>Delete:</b> customers can't be deleted (by design).</li>
+    </ul>
+  </div></details>
+
+  <details><summary>🧾 Orders (/orders): SA, OM, OS, IM (view only)</summary><div>
+<div class="chain"><span class="m">ngOnInit</span> → loadOrders() + loadAllOrders() + getAllCustomers() + getMyTasks() + read ?search=
+<span class="c">Create:</span> <span class="m">addItem()</span> / <span class="m">removeItem(i)</span> on a FormArray  →  <span class="m">isShortage(item)</span> shows a warning
+         submit → OrderService.<span class="m">createOrder</span>({customer_id, items}) → <span class="h">POST</span> <span class="e">orders/</span>
+<span class="c">Status:</span> <span class="m">openStatus(order)</span> → only the allowed next statuses are offered
+         <span class="m">updateStatus()</span> → <span class="h">PATCH</span> <span class="e">orders/{id}/status</span> {status}
+<span class="c">Details:</span> <span class="m">openDetails(order)</span> → items, quantities, stock status per line</div>
+    <h3>Order status state machine (<code>NEXT_ORDER_STATUSES</code>)</h3>
+    <div class="states">
+      <span class="st">ORDER_PLACED</span>→<span class="st">CONFIRMED</span>→<span class="st">PROCESSING</span>→<span class="st">PACKED</span>→<span class="st">SHIPPED</span>→<span class="st">OUT_FOR_DELIVERY</span>→<span class="st t">DELIVERED</span>
+    </div>
+    <div class="states">
+      Stock loop: <span class="st w">AWAITING_STOCK</span>→<span class="st w">SUPPLIER_ORDER_PLACED</span>→<span class="st w">STOCK_RECEIVED</span>→<span class="st">PROCESSING</span>
+    </div>
+    <div class="states"><span class="st x">CANCELLED</span> is allowed from any status before PACKED.</div>
+    <p><code>canUpdateOrder(order)</code> = the role can change status (SA, OM, OS) <b>and</b> there is at least one next status. An Inventory Manager can view orders but not change them.</p>
+    <div class="say">The UI only offers legal next steps, so a user can't jump from Placed to Delivered. The backend validates the move again.</div>
+  </div></details>
+
+  <details><summary>🤖 Predictions (/predictions): SA, OM, OS, IM</summary><div>
+    <div class="grid">
+      <div class="card"><h4>Order-based</h4><p>Pick an open order. <code>predictSelectedOrder()</code> → <code>predictOrderDelivery(id)</code> → POST predictions/orders/{id}. The backend extracts the features itself.</p></div>
+      <div class="card"><h4>Manual "what-if"</h4><p>A form with quantity, items, stock, reorder level, supplier lead time, processing and shipping time, and date. It calls POST predictions/delivery, with the features sent as query params.</p></div>
+    </div>
+    <p>The result shows the predicted days. If the prediction is <b>more than 5 days</b>, it shows a <b>DELAY RISK</b> badge.</p>
+  </div></details>
+
+  <details><summary>✅ Tasks (/tasks, /tasks/manage)</summary><div>
+    <div class="tbl"><table>
+      <tr><th>Page</th><th>Who</th><th>Main functions → API</th></tr>
+      <tr><td>My Tasks</td><td>All except SA</td><td><code>getMyTasksPage()</code> → GET tasks/my. <code>updateStatus(task)</code> moves PENDING → IN_PROGRESS → COMPLETED (PATCH tasks/{id}/status).</td></tr>
+      <tr><td>Manage Tasks</td><td>SA, IM, OM</td><td><code>getTasks()</code> → GET tasks/. For the assignees, SA calls <code>getAllUsers()</code> and managers call <code>getAllUsersTeam()</code>. Delete calls DELETE tasks/{id}.</td></tr>
+      <tr><td>Task form</td><td>SA, IM, OM</td><td>title, assignee, priority (LOW/MEDIUM/HIGH), target_type and target_id. Saving calls POST or PUT tasks/.</td></tr>
+    </table></div>
+    <p>Tasks are what power ABAC (section 7). When a task is completed, the staff member loses edit rights on that record.</p>
+  </div></details>
+
+  <details><summary>👥 Users (/admin/users): SA only</summary><div>
+<div class="chain"><span class="m">getUsers({page, pageSize:10})</span> → <span class="h">GET</span> <span class="e">users/</span>
+<span class="m">changeRole(user, role)</span> → confirm() → UserService.changeRole → <span class="h">PATCH</span> <span class="e">users/{id}/role</span>
+   if it was MY OWN role → clearSession() → /login?reason=role-changed</div>
+  </div></details>
+
+  <details><summary>🔐 Login &amp; Signup (/login, /signup): public</summary><div>
+    <ul>
+      <li><b>Login:</b> <code>onSubmit()</code> → <code>AuthService.login</code> → <code>startSession</code> → /dashboard. It shows a message for <code>?reason=role-changed</code> or <code>session-changed</code>.</li>
+      <li><b>Signup:</b> <code>onSubmit()</code> → <code>signup()</code> → POST auth/register. It shows "Account created", then goes to /login after 1.5 s.</li>
+    </ul>
+  </div></details>
+</section>
+
+<!-- 10 LAYOUT -->
+<section id="layout">
+  <h2><span class="n">10</span>Layout, sidebar &amp; global search</h2>
+  <p class="sub">The shell that wraps every logged-in page.</p>
+  <div class="flow">
+    <div class="step"><b>LayoutComponent</b>Holds <code>isSidebarOpen</code></div><div class="arrow">→</div>
+    <div class="step"><b>SidebarComponent</b><code>@Input isOpen</code>, <code>@Output sidebarClosed</code></div><div class="arrow">+</div>
+    <div class="step"><b>TopbarComponent</b><code>@Output toggleSidebar</code></div><div class="arrow">+</div>
+    <div class="step"><b>&lt;router-outlet&gt;</b>The feature page</div>
+  </div>
+
+  <h3>Sidebar</h3>
+  <ul>
+    <li>Four collapsible sections: <b>Inventory</b>, <b>Sales</b>, <b>AI</b> and <b>Management</b>. Their open or closed state is saved in <code>localStorage['sidebar_sections']</code>.</li>
+    <li>Each link is shown by a getter that calls a role helper (<code>canViewProducts()</code>, <code>canViewOrders()</code>, …). Because those helpers read the signal, the menu updates by itself.</li>
+    <li>The menu matches the route guards, so a user never sees a link they can't open.</li>
+    <li><code>logout()</code> lives here.</li>
+  </ul>
+
+  <h3>Topbar global search: flow</h3>
+  <div class="flow">
+    <div class="step"><b>1. Load</b><code>forkJoin</code> loads products, suppliers, categories, customers and orders. Each call is wrapped in <code>safe()</code>, so a failed list becomes <code>[]</code>.</div><div class="arrow">→</div>
+    <div class="step"><b>2. Type</b><code>onSearchInput</code> filters the index and keeps the first 8 matches.</div><div class="arrow">→</div>
+    <div class="step"><b>3. Choose</b>Click, or use the arrow keys and Enter (<code>onSearchKeydown</code>).</div><div class="arrow">→</div>
+    <div class="step g"><b>4. Show</b><code>selectSuggestion</code> navigates to <code>/products?search=Mouse</code>, and the list page filters itself.</div>
+  </div>
+<pre><code><span class="c">// one failing API should not kill the whole search</span>
+<span class="k">const</span> <span class="f">safe</span> = &lt;T&gt;(obs: Observable&lt;T[]&gt;) =&gt; obs.pipe(catchError(() =&gt; of([] <span class="k">as</span> T[])));
+
+forkJoin({
+  products:   safe(<span class="k">this</span>.productService.getAllProducts()),
+  suppliers:  safe(<span class="k">this</span>.supplierService.getAllSuppliers()),
+  categories: safe(<span class="k">this</span>.categoryService.getAllCategories()),
+  customers:  safe(<span class="k">this</span>.customerService.getAllCustomers()),
+  orders:     safe(<span class="k">this</span>.orderService.getAllOrders()),
+}).subscribe(data =&gt; <span class="k">this</span>.index = buildIndex(data));</code></pre>
+  <p>The list pages (products, categories, suppliers, customers, orders) read <code>?search=</code> with <code>route.queryParamMap.subscribe(…)</code>.</p>
+</section>
+
+<!-- 11 APIS -->
+<section id="apis">
+  <h2><span class="n">11</span>All 41 APIs</h2>
+  <p class="sub">Base URL: <code>http://localhost:8000/api/v1/</code>. 41 are defined and 38 are actually called.</p>
+  <div class="tbl"><table>
+    <tr><th>#</th><th>Method</th><th>Path</th><th>Service.method</th><th>Used by</th></tr>
+    <tr><td colspan="5"><b>Auth (4)</b></td></tr>
+    <tr><td>1</td><td>POST</td><td>auth/login</td><td>AuthService.login</td><td>Login</td></tr>
+    <tr><td>2</td><td>POST</td><td>auth/register</td><td>AuthService.signup</td><td>Signup</td></tr>
+    <tr><td>3</td><td>POST</td><td>auth/refresh</td><td>AuthService.refreshToken</td><td>SessionService</td></tr>
+    <tr><td>4</td><td>POST</td><td>auth/logout</td><td>AuthService.logout</td><td>Sidebar</td></tr>
+    <tr><td colspan="5"><b>Products + dashboard (7)</b></td></tr>
+    <tr><td>5</td><td>GET</td><td>products/</td><td>getProducts / getAllProducts</td><td>Products, Dashboard, Orders, Topbar, TaskForm</td></tr>
+    <tr><td>6</td><td>GET</td><td>products/{id}</td><td>getProductById</td><td>ProductsForm</td></tr>
+    <tr><td>7</td><td>POST</td><td>products/</td><td>addProduct</td><td>ProductsForm</td></tr>
+    <tr><td>8</td><td>PUT</td><td>products/{id}</td><td>updateProduct</td><td>ProductsForm</td></tr>
+    <tr><td>9</td><td>PATCH</td><td>products/{id}/stock</td><td>adjustStock</td><td>ProductsList</td></tr>
+    <tr><td>10</td><td>DELETE</td><td>products/{id}</td><td>deleteProduct</td><td>ProductsList</td></tr>
+    <tr><td>11</td><td>GET</td><td>products/summary</td><td>DashboardService.getSummary</td><td>Dashboard</td></tr>
+    <tr><td colspan="5"><b>Categories (5)</b></td></tr>
+    <tr><td>12</td><td>GET</td><td>categories/</td><td>getCategories / getAllCategories</td><td>Categories, Topbar, Products, TaskForm</td></tr>
+    <tr><td>13</td><td>GET</td><td>categories/{id}</td><td>getCategoryById</td><td>CategoriesForm</td></tr>
+    <tr><td>14</td><td>POST</td><td>categories/</td><td>addCategory</td><td>CategoriesForm</td></tr>
+    <tr><td>15</td><td>PUT</td><td>categories/{id}</td><td>updateCategory</td><td>CategoriesForm</td></tr>
+    <tr><td>16</td><td>DELETE</td><td>categories/{id}</td><td>deleteCategory</td><td>CategoriesList</td></tr>
+    <tr><td colspan="5"><b>Suppliers (5)</b></td></tr>
+    <tr><td>17</td><td>GET</td><td>suppliers/</td><td>getSuppliers / getAllSuppliers</td><td>Suppliers, Topbar, Products, TaskForm</td></tr>
+    <tr><td>18</td><td>GET</td><td>suppliers/{id}</td><td>getSupplierById</td><td>SuplierForm</td></tr>
+    <tr><td>19</td><td>POST</td><td>suppliers/</td><td>addSupplier</td><td>SuplierForm</td></tr>
+    <tr><td>20</td><td>PUT</td><td>suppliers/{id}</td><td>updateSupplier</td><td>SuplierForm</td></tr>
+    <tr><td>21</td><td>DELETE</td><td>suppliers/{id}</td><td>deleteSupplier</td><td>SupplierList</td></tr>
+    <tr><td colspan="5"><b>Customers (4)</b></td></tr>
+    <tr><td>22</td><td>GET</td><td>customers/</td><td>getCustomers / getAllCustomers</td><td>Customers, Orders, Predictions, Topbar, TaskForm</td></tr>
+    <tr><td>23</td><td>GET</td><td>customers/{id}</td><td>getCustomer</td><td><i>never called</i></td></tr>
+    <tr><td>24</td><td>POST</td><td>customers/</td><td>addCustomer</td><td>Customers</td></tr>
+    <tr><td>25</td><td>PUT</td><td>customers/{id}</td><td>updateCustomer</td><td>Customers</td></tr>
+    <tr><td colspan="5"><b>Orders (4)</b></td></tr>
+    <tr><td>26</td><td>GET</td><td>orders/</td><td>getOrders / getAllOrders</td><td>Orders, Dashboard, Predictions, Topbar, TaskForm</td></tr>
+    <tr><td>27</td><td>GET</td><td>orders/{id}</td><td>getOrder</td><td><i>never called</i></td></tr>
+    <tr><td>28</td><td>POST</td><td>orders/</td><td>createOrder</td><td>Orders</td></tr>
+    <tr><td>29</td><td>PATCH</td><td>orders/{id}/status</td><td>updateOrderStatus</td><td>Orders</td></tr>
+    <tr><td colspan="5"><b>Predictions (2)</b></td></tr>
+    <tr><td>30</td><td>POST</td><td>predictions/orders/{id}</td><td>predictOrderDelivery</td><td>Predictions</td></tr>
+    <tr><td>31</td><td>POST</td><td>predictions/delivery</td><td>predictDelivery</td><td>Predictions</td></tr>
+    <tr><td colspan="5"><b>Tasks (7)</b></td></tr>
+    <tr><td>32</td><td>GET</td><td>tasks/my</td><td>getMyTasksPage / getMyTasks</td><td>MyTasks + ABAC on every list page</td></tr>
+    <tr><td>33</td><td>GET</td><td>tasks/</td><td>getTasks</td><td>ManageTasks</td></tr>
+    <tr><td>34</td><td>GET</td><td>tasks/{id}</td><td>getTask</td><td><i>never called</i></td></tr>
+    <tr><td>35</td><td>POST</td><td>tasks/</td><td>createTask</td><td>TaskForm</td></tr>
+    <tr><td>36</td><td>PUT</td><td>tasks/{id}</td><td>updateTask</td><td>TaskForm</td></tr>
+    <tr><td>37</td><td>PATCH</td><td>tasks/{id}/status</td><td>updateTaskStatus</td><td>MyTasks</td></tr>
+    <tr><td>38</td><td>DELETE</td><td>tasks/{id}</td><td>deleteTask</td><td>ManageTasks</td></tr>
+    <tr><td colspan="5"><b>Users (3)</b></td></tr>
+    <tr><td>39</td><td>GET</td><td>users/</td><td>getUsers / getAllUsers</td><td>UserManagement, ManageTasks (SA)</td></tr>
+    <tr><td>40</td><td>GET</td><td>users/team</td><td>getUsersTeam / getAllUsersTeam</td><td>ManageTasks (managers)</td></tr>
+    <tr><td>41</td><td>PATCH</td><td>users/{id}/role</td><td>changeRole</td><td>UserManagement</td></tr>
+  </table></div>
+</section>
+
+<!-- 12 CODE -->
+<section id="code">
+  <h2><span class="n">12</span>Important code</h2>
+  <p class="sub">The snippets worth showing on screen.</p>
+
+  <h3>app.module.ts: wiring the interceptor and startup</h3>
+<pre><code>providers: [
+  provideHttpClient(withInterceptors([authInterceptor])),       <span class="c">// every HTTP call goes through it</span>
+  { provide: APP_INITIALIZER, useFactory: sessionInitFactory,    <span class="c">// runs before the first route</span>
+    deps: [SessionService], multi: <span class="k">true</span> }
+]</code></pre>
+
+  <h3>Lazy loading a feature (layout-routing.module.ts)</h3>
+<pre><code>{
+  path: <span class="s">'products'</span>,
+  canActivate: [roleGuard],
+  data: { roles: PRODUCT_VIEW },                                 <span class="c">// SA, IM, IS, OM</span>
+  loadChildren: () =&gt; import(<span class="s">'../features/products/products.module'</span>).then(m =&gt; m.ProductsModule)
+}</code></pre>
+
+  <h3>The interceptor's 401 handling</h3>
+<pre><code><span class="k">return</span> next(authorized).pipe(
+  catchError((error: HttpErrorResponse) =&gt; {
+    <span class="k">if</span> (error.status !== <span class="s">401</span> || authEndpoint) <span class="k">return</span> throwError(() =&gt; error);  <span class="c">// no loop</span>
+    <span class="k">return</span> session.refresh().pipe(
+      catchError(refreshError =&gt; {                                  <span class="c">// ONLY catches refresh failure</span>
+        router.navigate([<span class="s">'/login'</span>], { queryParams: { returnUrl: router.url, reason: <span class="s">'session-changed'</span> } });
+        <span class="k">return</span> throwError(() =&gt; refreshError);
+      }),
+      switchMap(newToken =&gt; next(withBearer(req, newToken)))      <span class="c">// replay once with the new token</span>
+    );
+  })
+);</code></pre>
+  <div class="callout"><b>Why is catchError above switchMap?</b> So it only catches a <i>refresh</i> failure. If the replayed request fails for another reason, the session is not thrown away.</div>
+
+  <h3>Proactive refresh timer</h3>
+<pre><code><span class="k">constructor</span>() { effect(() =&gt; <span class="k">this</span>.armFor(currentUser()?.access_token ?? <span class="k">null</span>)); }
+
+<span class="k">private</span> <span class="f">armFor</span>(token) {
+  <span class="k">this</span>.clearTimer();
+  <span class="k">if</span> (!token) <span class="k">return</span>;                                         <span class="c">// logged out → no timer</span>
+  <span class="k">const</span> delay = Math.max(<span class="s">0</span>, tokenExpiry(token) - Date.now() - REFRESH_LEEWAY_MS); <span class="c">// 60 000 ms</span>
+  <span class="k">this</span>.timer = setTimeout(() =&gt; <span class="k">this</span>.refreshNow(), delay);
+}</code></pre>
+
+  <h3>Order state machine</h3>
+<pre><code><span class="k">const</span> NEXT_ORDER_STATUSES = {
+  ORDER_PLACED:          [<span class="s">'CONFIRMED'</span>, <span class="s">'CANCELLED'</span>],
+  CONFIRMED:             [<span class="s">'PROCESSING'</span>, <span class="s">'AWAITING_STOCK'</span>, <span class="s">'CANCELLED'</span>],
+  PROCESSING:            [<span class="s">'PACKED'</span>, <span class="s">'AWAITING_STOCK'</span>, <span class="s">'CANCELLED'</span>],
+  AWAITING_STOCK:        [<span class="s">'SUPPLIER_ORDER_PLACED'</span>, <span class="s">'CANCELLED'</span>],
+  SUPPLIER_ORDER_PLACED: [<span class="s">'STOCK_RECEIVED'</span>, <span class="s">'CANCELLED'</span>],
+  STOCK_RECEIVED:        [<span class="s">'PROCESSING'</span>],
+  PACKED: [<span class="s">'SHIPPED'</span>], SHIPPED: [<span class="s">'OUT_FOR_DELIVERY'</span>], OUT_FOR_DELIVERY: [<span class="s">'DELIVERED'</span>],
+  DELIVERED: [], CANCELLED: []
+};</code></pre>
+</section>
+
+<!-- 13 ISSUES -->
+<section id="issues">
+  <h2><span class="n">13</span>Known issues &amp; fixes</h2>
+  <p class="sub">Being open about these shows maturity. Each one has a small, known fix.</p>
+  <div class="tbl"><table>
+    <tr><th>#</th><th>Issue</th><th>Fix</th><th>Effort</th></tr>
+    <tr><td>1</td><td>A reload after the token expires sends the user to login, because <code>hasStoredSession()</code> checks the empty signal.</td><td>Check <code>localStorage.getItem(STORAGE_KEY) !== null</code> instead.</td><td>2 min</td></tr>
+    <tr><td>2</td><td>The production build still points to <code>localhost:8000</code>.</td><td>Set the real <code>apiUrl</code> in <code>environment.ts</code>.</td><td>2 min</td></tr>
+    <tr><td>3</td><td>Delete does nothing for a row found by search on another page.</td><td>Look the row up in <code>allProducts</code> first, then <code>products</code> (same for categories and suppliers).</td><td>5 min</td></tr>
+    <tr><td>4</td><td>The product form can send a null category or supplier id, because disabled controls skip validation.</td><td>Check the ids in <code>onSubmit()</code>.</td><td>5 min</td></tr>
+    <tr><td>5</td><td>Add and edit child routes use <code>ALL_ROLES</code>, so an Order Manager can open <code>/products/add</code> by URL.</td><td>Use the inventory roles on add and edit, and later add an ABAC guard.</td><td>10 min</td></tr>
+    <tr><td>6</td><td><code>roleGuard</code> sends a logged-in user to /login when they lack access.</td><td>Redirect to /dashboard (or a 403 page) instead.</td><td>2 min</td></tr>
+    <tr><td>7</td><td>The access token is in localStorage, where an XSS bug could read it.</td><td>Keep it in memory only and restore it through the refresh cookie.</td><td>30 min</td></tr>
+    <tr><td>8</td><td>Search runs in the browser.</td><td>Use the backend <code>search</code> param, with <code>debounceTime</code> and <code>switchMap</code>.</td><td>Later</td></tr>
+  </table></div>
+</section>
+
+<!-- 14 DEMO -->
+<section id="demo">
+  <h2><span class="n">14</span>Demo plan &amp; manager Q&amp;A</h2>
+  <p class="sub">About 12 minutes. Log in fresh before you start.</p>
+  <div class="tbl"><table>
+    <tr><th>Step</th><th>Role</th><th>Show</th><th>Key line</th></tr>
+    <tr><td>1</td><td>–</td><td>Folder tree</td><td>"Angular 17, 5 roles, RBAC + ABAC, JWT with silent refresh."</td></tr>
+    <tr><td>2</td><td>SA</td><td>Login + DevTools localStorage</td><td>"The role comes from the JWT; the refresh token is an httpOnly cookie."</td></tr>
+    <tr><td>3</td><td>SA</td><td>Sidebar</td><td>"The menu is built from the role; the guards match it."</td></tr>
+    <tr><td>4</td><td>SA</td><td>Dashboard</td><td>"Role-aware blocks, and parallel loading with forkJoin."</td></tr>
+    <tr><td>5</td><td>IM</td><td>Products: search + stock IN</td><td>"Stock changes go through an audited endpoint with a reason."</td></tr>
+    <tr><td>6 ⭐</td><td>IM → IS</td><td>Assign a task → staff can edit only that product → complete the task → the rights are gone</td><td>"Attribute-based access driven by tasks."</td></tr>
+    <tr><td>7</td><td>OM</td><td>Create an order, then change status</td><td>"Only legal next statuses are offered."</td></tr>
+    <tr><td>8</td><td>OM</td><td>Predictions</td><td>"ML delivery estimate, with a delay-risk badge above 5 days."</td></tr>
+    <tr><td>9</td><td>SA</td><td>Change a user's role</td><td>"A role change forces a fresh login."</td></tr>
+    <tr><td>10</td><td>–</td><td>Interceptor + session code</td><td>"One shared refresh, then the request is replayed."</td></tr>
+  </table></div>
+
+  <h3>Likely questions</h3>
+  <details><summary>Why NgModules and not standalone?</summary><div>It's the classic, well-documented style and easy to lazy load with <code>loadChildren</code>. Angular 17 supports both, and moving to standalone would only remove boilerplate.</div></details>
+  <details><summary>Is hiding buttons enough for security?</summary><div>No. Guards and hidden buttons are for user experience. The backend checks the role and the task on every write; it is the real security boundary.</div></details>
+  <details><summary>You decode the JWT without checking the signature. Is that safe?</summary><div>Yes. The client only uses the role and expiry to decide what to show. The server verifies the signature on every request. Editing the token locally only changes what the user sees; the API still refuses.</div></details>
+  <details><summary>What if 5 requests get a 401 at the same time?</summary><div>One refresh call. <code>refresh()</code> keeps one in-flight observable, and <code>shareReplay</code> shares its result. All 5 requests are replayed with the new token.</div></details>
+  <details><summary>How do you avoid an infinite refresh loop?</summary><div>Auth URLs are skipped. A 401 from <code>auth/refresh</code> is rethrown, and the replayed request sits outside the <code>catchError</code>.</div></details>
+  <details><summary>How does pagination work?</summary><div>Tables ask for one page of 10. For search and access checks, <code>fetchAll</code> uses <code>expand</code> + <code>reduce</code> to read all pages, 100 rows at a time.</div></details>
+  <details><summary>What would you improve first?</summary><div>The session restore on reload, the production API URL, an in-memory token, guards on add and edit routes, the delete lookup fix, server-side search and green tests.</div></details>
+  <details><summary>How many APIs?</summary><div>41 endpoints are defined across 10 resource services, and 38 are used. <code>customers/{id}</code>, <code>orders/{id}</code> and <code>tasks/{id}</code> are defined but unused.</div></details>
+
+  <div class="say">If I had another week, I would fix the session restore on reload, keep the token in memory, add server-side search, tighten the add and edit route guards, and get the whole test suite green.</div>
+</section>
+
+<footer>StockFlow frontend guide · branch feat/rolebased · kittypawgrammer/Inventory_stock_management_frontend</footer>
+</main>
+</div>
+</body>
+</html>
